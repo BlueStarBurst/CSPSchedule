@@ -16,7 +16,7 @@ const serverConfig = {
 const port = process.env.PORT || 26950;
 
 //initialize a http server
-const server = http.createServer(app);
+const server = https.createServer(serverConfig, app);
 
 //initialize the WebSocket server instance
 const wss = new WebSocket.Server({ server });

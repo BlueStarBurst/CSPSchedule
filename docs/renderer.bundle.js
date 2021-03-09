@@ -30060,7 +30060,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
 
 
-var server = new WebSocket("ws://blueserver.us.to:26950/");
+var server = new WebSocket("wss://blueserver.us.to:26950/");
 
 server.onopen = () => {
   console.log("hi!");
