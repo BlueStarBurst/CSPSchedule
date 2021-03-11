@@ -13,7 +13,20 @@ const serverConfig = {
   cert: fs.readFileSync(__dirname + '/cert.pem'),
 };
 
-const port = process.env.PORT || 26950;
+
+
+const port = 26950;
+
+const HTTPS_PORT = 443;
+
+capp.get('/', function(req, res) {
+  res.sendFile(path.join(__dirname,'..') + '/docs/index.html');
+});
+
+capp.use(express.static('docs'))
+
+const httpsServer = https.createServer(serverConfig, capp);
+httpsServer.listen(HTTPS_PORT, '0.0.0.0');
 
 //initialize a http server
 const server = https.createServer(serverConfig, app);
@@ -40,6 +53,7 @@ const sendToAll = (clients, type, { id, name: userName }) => {
   });
 };
 
+
 wss.on('connection', function connection(ws) {
   users.push(ws);
   
@@ -48,9 +62,11 @@ wss.on('connection', function connection(ws) {
   });
 
   ws.send('something');
+
+  console.log("connection!");
 });
 
 //start our server
 server.listen(port, () => {
-  console.log(`Signalling Server running on port: ${port}`);
+  console.log(`Server running on: wss://blueserver.us.to:${port}`);
 });
