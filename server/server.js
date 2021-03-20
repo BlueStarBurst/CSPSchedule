@@ -13,8 +13,6 @@ const serverConfig = {
   cert: fs.readFileSync(__dirname + '/cert.pem'),
 };
 
-
-
 const port = 26950;
 
 const HTTPS_PORT = 443;
@@ -52,7 +50,6 @@ const sendToAll = (clients, type, { id, name: userName }) => {
     }
   });
 };
-
 
 wss.on('connection', function connection(ws) {
   users.push(ws);

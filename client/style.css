@@ -1,18 +1,132 @@
+html {
+  scroll-behavior: smooth;
+  overflow: auto;
+  background-color: rgba(10,10,10,255)
+}
+
 .unselectable {
-    -webkit-user-select: none;  
-  -moz-user-select: none;     
-  -ms-user-select: none;      
-  user-select: none; 
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 * {
-    user-select: none;
-   -khtml-user-select: none;
-   -o-user-select: none;
-   -moz-user-select: -moz-none;
-   -webkit-user-select: none;
-   overflow: hidden;
+  user-select: none;
+  -khtml-user-select: none;
+  -o-user-select: none;
+  -moz-user-select: -moz-none;
+  -webkit-user-select: none;
 }
 
-::selection { background: transparent;color:inherit; }
-::-moz-selection { background: transparent;color:inherit; }
+::selection {
+  background: transparent;
+  color: inherit;
+}
+::-moz-selection {
+  background: transparent;
+  color: inherit;
+}
+
+
+
+.times {
+  color: white;
+  width: 10%;
+  text-align: center;
+}
+
+
+
+table {
+  table-layout: fixed;
+  margin: 0;
+  padding: 0;
+  border-color: transparent;
+  border-collapse: collapse;
+  border-spacing: 0;
+  top: 0;
+}
+
+td {
+  border-color: rgb(94, 94, 94) !important;
+  color: white;
+  padding: 0 !important;
+  margin: 0 !important;
+  background-color: rgba(20, 20, 20, 255);
+}
+
+tr {
+  min-height: 500px;
+  margin: 0;
+  padding: 0;
+}
+
+.schedule {
+  
+  color: white;
+  position: relative;
+  margin: 0;
+  height: 70vh;
+  overflow: scroll;
+  scrollbar-width: none;
+}
+
+.schedule::-webkit-scrollbar {
+  display: none;
+}
+
+
+.highlighted {
+  background-color: rgba(255, 255, 255, 0.048)
+}
+
+.week {
+  margin: 0;
+  padding: 0;
+}
+
+.head {
+  margin: 0;
+  height: min-content;
+}
+
+.empty {
+  color: transparent;
+  border-color: transparent;
+  border-bottom: 3px transparent solid;
+  width: 10%;
+}
+
+.headers {
+  border-bottom: 3px white solid;
+  background-color: transparent;
+}
+
+.hour {
+  height: 150px;
+  top: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.currentTime {
+  position: absolute;
+  width: 100%;
+  height: 3px;
+  background-color: red;
+  opacity: 0;
+}
+
+.currentTimeAnim {
+  animation: slideDown 2s ease-out;
+}
+
+@keyframes slideDown {
+  0% { transform: translateY(-100vh); opacity: 0;}
+  100% { transform: translateY(0%); opacity: 1; }
+}
+
+.header {
+  background-color: transparent;
+}
