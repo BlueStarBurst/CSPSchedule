@@ -1,6 +1,12 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { render } from 'react-dom'
 import Table from 'react-bootstrap/Table'
+import InputGroup from 'react-bootstrap/InputGroup'
+import FormControl from 'react-bootstrap/FormControl'
+import Dropdown from 'react-bootstrap/Dropdown'
+import DropdownButton from 'react-bootstrap/DropdownButton'
+import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form'
 
 import "./style.css"
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -27,39 +33,187 @@ let weeklyMeetings = [
         date: "3/19/2021",
         time: "12",
         text: "indexing and iteration practice",
-        author: "Bryant",
+        attendees: "Bryant",
         len: 60
     }
 ]
+
+let subjectStyles = {
+    CS: {
+        border: "transparent",
+        background: "rgba(30, 132, 227, 0.5)"
+    }
+}
 
 server.onopen = () => {
     console.log(date)
 }
 
-function createTask(props) {
+var selectedDate;
+var selectedTime;
+
+function CreateTask(props) {
+
+    const [current, setCurrent] = useState(selectedDate);
 
     var container = {
-        "position": "absolute",
+        "position": "fixed",
         "width": "100vw",
         "height": "100vh",
         "top": "0",
         "left": "0",
+        "backgroundColor": "rgba(0, 0, 0, 0.5)",
+        "zIndex": "200",
+        "display": "none"
     }
 
     var style = {
-        "position": "absolute",
-        "maxWidth": "300px",
-        "width": "30vw",
-        "maxHeight": "500px",
-        "height": "40vh",
+        "width": "500px",
+        "height": "auto",
+        "backgroundColor": "rgb(25, 25, 25)",
+        "margin": "20vh auto",
+        "padding": "40px",
+        "borderRadius": "20px",
+        "color": "white"
     }
-    return (
-        <div style={container}>
-            <div style={style}>
 
+    var interval;
+
+    function reset() {
+        clearInterval(interval);
+        interval = null;
+        setCurrent(selectedDate);
+    }
+
+    useEffect(() => {
+        reset();
+        interval = setInterval(() => {
+            if (current != selectedDate) {
+                reset();
+            }
+        }, 1000);
+    }, [current])
+
+    var date = "2021-03-" + selectedDate;
+    var time = selectedTime + ":00";
+    console.log(time);
+
+
+
+    return (
+        <div style={container} id="createTask" onClick={function (e) {
+            if (e.target.id == "createTask")
+                document.getElementById("createTask").style.display = "none";
+        }}>
+            <div style={style} id="form">
+                <h5>Schedule a meeting!</h5>
+                <br />
+                <Form>
+                    <Form.Row>
+                        <Form.Group>
+                            <Form.Label>Subject</Form.Label>
+                            <Form.Control type="text" placeholder="Class" />
+                        </Form.Group>
+                        <Form.Group style={{ marginLeft: "2%" }}>
+                            <Form.Label>Title</Form.Label>
+                            <Form.Control type="textarea" placeholder="Brief Overview" />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group>
+                            <Form.Label>Date</Form.Label>
+                            <Form.Control type="date" value={date} />
+                        </Form.Group>
+                        <Form.Group style={{ marginLeft: "2%" }}>
+                            <Form.Label>Time</Form.Label>
+                            <Form.Control type="time" value={time} />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group>
+                            <Form.Label>Length</Form.Label>
+                            <Form.Control as="select">
+                                <option value="15">00:15</option>
+                                <option value="30">00:30</option>
+                                <option value="45">00:45</option>
+                                <option value="60">01:00</option>
+                                <option value="75">01:15</option>
+                                <option value="90">01:30</option>
+                                <option value="105">01:45</option>
+                                <option value="120">02:00</option>
+                            </Form.Control>
+
+                        </Form.Group>
+                        <Form.Group style={{ marginLeft: "2%" }}>
+                            <Form.Label style={{ color: "transparent" }}> uwu </Form.Label>
+                            <br />
+                            <Button type="submit">Submit form</Button>
+                        </Form.Group>
+                    </Form.Row>
+                </Form>
             </div>
         </div>
     )
+
+    /*
+    return (
+        <div style={container} id="createTask">
+            <div style={style}>
+                <h5>Schedule a meeting!</h5>
+                <br />
+                <InputGroup style={input}>
+                    <InputGroup.Prepend>
+                        <InputGroup.Text id="basic-addon1">Title</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <FormControl
+                        placeholder="Title"
+                        aria-label="Title"
+                        aria-describedby="basic-addon1"
+                    />
+                </InputGroup>
+                <br />
+                <InputGroup style={input}>
+                    <InputGroup.Prepend>
+                        <InputGroup.Text id="basic-addon1">Subject</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <FormControl
+                        placeholder="Class"
+                        aria-label="Class"
+                        aria-describedby="basic-addon1"
+                    />
+                </InputGroup>
+                <br />
+                <InputGroup style={input}>
+                    <InputGroup.Prepend>
+                        <InputGroup.Text id="basic-addon1">Date</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <input type="date" id="start" name="trip-start"
+                        value={date} />
+                    <input type="time" id="appt" name="appt" value={time}
+                        min="09:00" max="18:00" required />
+                </InputGroup>
+                <br />
+                <InputGroup style={input}>
+                    <InputGroup.Prepend>
+                        <InputGroup.Text id="basic-addon1">Length</InputGroup.Text>
+                    </InputGroup.Prepend>
+                    <select>
+                        <option value="15">00:15</option>
+                        <option value="30">00:30</option>
+                        <option value="45">00:45</option>
+                        <option value="60">01:00</option>
+                        <option value="75">01:15</option>
+                        <option value="90">01:30</option>
+                        <option value="105">01:45</option>
+                        <option value="120">02:00</option>
+                    </select>
+                    <InputGroup.Append>
+                        <Button>Submit!</Button>
+                    </InputGroup.Append>
+                </InputGroup>
+            </div>
+        </div>
+    )*/
 }
 
 function Task(props) {
@@ -69,18 +223,23 @@ function Task(props) {
 
     useEffect(() => {
 
-    },[timeHeight])
+    }, [timeHeight])
 
     var style = {
-        "backgroundColor": "blue",
+        "backgroundColor": subjectStyles[props.meeting.subject].background,
         "display": "block",
-        "height": timeHeight * (props.meeting.len / 60) + "px",
-        "width": "100%",
+        "height": timeHeight * (props.meeting.len / 60) - 3 + "px",
+        "borderRadius": "10px",
+        "border": "2px " + subjectStyles[props.meeting.subject].border + " solid",
     }
 
     return (
-        <div style={style}>
-            HIAFJK
+        <div style={style} className="task">
+            <p>{props.meeting.text}</p>
+            <div>
+                <p>Attendees:</p>
+                <p>{props.meeting.attendees}</p>
+            </div>
         </div>
     )
 }
@@ -97,8 +256,20 @@ function Hour(props) {
         }
     }
 
+    function selectHour(e) {
+        if (click > 100 || moving) {
+            console.log("moving");
+        }
+        else {
+            console.log("not moving")
+            document.getElementById("createTask").style.display = "block";
+            selectedDate = props.date;
+            selectedTime = props.hour;
+        }
+    }
+
     return (
-        <div className="hour" id={id}>
+        <div className="hour" id={id} onClick={selectHour}>
             {text}
         </div>
     )
@@ -128,15 +299,10 @@ function Week(props) {
     return (
         <div className="week">
             <Header date={props.date} />
-
             <div className="schedule" onMouseDown={swipe} id="schedule">
                 <div id={"currentTime"} className="currentTime" />
                 <Table bordered hover>
-
-
                     <tbody>
-
-
                         {Array.from({ length: 14 }).map((_, index) => {
                             var num = index + 8;
                             var time = num;
@@ -152,8 +318,8 @@ function Week(props) {
 
                             var id = "";
 
-                            if (props.date == date && parseInt(hour) == time) {
-                                console.log(time);
+                            console.log(hour + " " + time);
+                            if ((props.date == date && parseInt(hour) == time) || (hour >= 21 && time == 20)) {
                                 id = "scroll";
                             }
 
@@ -194,20 +360,19 @@ function UI(props) {
         <div>
             <h1>Schedule</h1>
         </div>
-        <div>
-
-        </div>
+        <CreateTask />
         <Week date={date} />
     </div>)
 }
 
 var mouse = null;
+var moving = false;
 var prev = [0, 0];
 function swipe(e) {
     mouse = [e.clientX, e.clientY];
     prev[0] = document.getElementById("schedule").scrollLeft;
     prev[1] = document.getElementById("schedule").scrollTop;
-    console.log(e);
+    //console.log(e);
 }
 
 render(
@@ -217,23 +382,38 @@ render(
     document.getElementById("root")
 );
 
-document.onmouseup = function () {
-    mouse = null; 
+var interval;
+var click = 0;
+
+document.onmouseup = function (e) {
+    if (mouse && mouse[0] - e.clientX < 5 && mouse[1] - e.clientY < 5) {
+        moving = false;
+    }
+    mouse = null;
+    clearInterval(interval);
+    interval = null;
+}
+
+document.onmousedown = function () {
+    click = 0;
+    clearInterval(interval);
+    interval = null;
+    interval = setInterval(function () {
+        click++;
+    }, 1);
 }
 
 document.onmousemove = function (e) {
+    moving = true;
     if (mouse != null) {
-        console.log((e.clientX - mouse[0]) + " " + (e.clientY - mouse[1]))
+        //console.log((e.clientX - mouse[0]) + " " + (e.clientY - mouse[1]))
         if (Math.abs(e.clientX - mouse[0]) > Math.abs(e.clientY - mouse[1])) {
             document.getElementById("schedule").scroll(-1 * (e.clientX - mouse[0]) + prev[0], prev[1]);
         }
         else {
             document.getElementById("schedule").scroll(prev[0], -1 * (e.clientY - mouse[1]) + prev[1]);
         }
-
-
     }
-
 }
 
 setInterval(() => {
@@ -244,18 +424,27 @@ setInterval(() => {
 
     /*
     if (document.getElementById("scroll")) {
-        console.log("schedule: " + document.getElementById("schedule").scrollTop);
+                console.log("schedule: " + document.getElementById("schedule").scrollTop);
         console.log("scroll: " + document.getElementById("scroll").offsetTop);
     }*/
     //console.log(timeHeight)
 
-    var hourDist = (hour-8) * timeHeight;
+
+
+    var hourDist = (hour - 8) * timeHeight;
     var minDist = (minute / 60) * timeHeight;
     var secDist = (timeHeight / 60) * (second / 60);
 
     var totalDist = (hourDist + minDist + secDist);
+    if (hour >= 21) {
+        totalDist = 14 * timeHeight;
+    } else if (hour < 8) {
+        totalDist = 0;
+    }
 
-    console.log(hourDist/timeHeight + "%");
+
+
+    //console.log(hourDist / timeHeight + "%");
 
     //moveCurrentTime(totalDist);
     document.getElementById("currentTime").style.top = totalDist + "px";
@@ -294,6 +483,6 @@ setTimeout(() => {
 
     document.getElementById("currentTime").style.opacity = "1";
     document.getElementById("currentTime").classList.add("currentTimeAnim");
-    console.log(document.getElementById("currentTime").classList);
+    //console.log(document.getElementById("currentTime").classList);
 
 }, 1000);
