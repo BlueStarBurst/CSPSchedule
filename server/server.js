@@ -13,9 +13,12 @@ const serverConfig = {
   cert: fs.readFileSync(__dirname + '/cert.pem'),
 };
 
-const port = 26950;
-
 const HTTPS_PORT = 443;
+
+const port = process.env.PORT || 26950;
+
+//initialize a http server
+const server = https.createServer(serverConfig, app);
 
 capp.get('/', function(req, res) {
   res.sendFile(path.join(__dirname,'..') + '/docs/index.html');
@@ -26,13 +29,17 @@ capp.use(express.static('docs'))
 const httpsServer = https.createServer(serverConfig, capp);
 httpsServer.listen(HTTPS_PORT, '0.0.0.0');
 
-//initialize a http server
-const server = https.createServer(serverConfig, app);
+
+http.createServer(function (req, res) {
+    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+    res.end();
+}).listen(80);
+
 
 //initialize the WebSocket server instance
 const wss = new WebSocket.Server({ server });
 
-let users = [];
+let users = {};
 
 const sendTo = (connection, message) => {
   connection.send(JSON.stringify(message));
@@ -51,19 +58,24 @@ const sendToAll = (clients, type, { id, name: userName }) => {
   });
 };
 
-wss.on('connection', function connection(ws) {
-  users.push(ws);
-  
-  ws.on('message', function incoming(message) {
-    console.log('received: %s', message);
+wss.on("connection", ws => {
+  ws.on("message", msg => {
+    console.log(msg);
   });
-
-  ws.send('something');
-
-  console.log("connection!");
+  ws.on("close", function() {
+    delete users[ws.name];
+    sendToAll(users, "leave", ws);
+  });
+  //send immediatly a feedback to the incoming connection
+  ws.send(
+    JSON.stringify({
+      type: "connect",
+      message: "Woohoo! You're connected!"
+    })
+  );
 });
 
 //start our server
 server.listen(port, () => {
-  console.log(`Server running on: wss://blueserver.us.to:${port}`);
+  console.log(`Signalling Server running on port: ${port}`);
 });

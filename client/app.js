@@ -25,6 +25,21 @@ let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 let timeHeight = 150;
 
 
+function createServerTask(e) {
+    e.preventDefault();
+    console.log(e);
+    document.getElementById("createTask").style.display = "none";
+    var JSONpackage = {
+        subject: document.getElementById("createSubject").value,
+        date: document.getElementById("createDate").value,
+        time: document.getElementById("createTime").value,
+        text: document.getElementById("createTitle").value,
+        attendees: "Bryant",
+        len: document.getElementById("createLength").value
+    }
+    server.send(JSON.stringify(JSONpackage));
+}
+
 // Storage for tutorials 
 
 let weeklyMeetings = [
@@ -77,6 +92,8 @@ function CreateTask(props) {
         "color": "white"
     }
 
+    /*
+
     var interval;
 
     function reset() {
@@ -97,7 +114,7 @@ function CreateTask(props) {
     var date = "2021-03-" + selectedDate;
     var time = selectedTime + ":00";
     console.log(time);
-
+*/
 
 
     return (
@@ -108,31 +125,31 @@ function CreateTask(props) {
             <div style={style} id="form">
                 <h5>Schedule a meeting!</h5>
                 <br />
-                <Form>
+                <Form onSubmit={createServerTask}>
                     <Form.Row>
                         <Form.Group>
                             <Form.Label>Subject</Form.Label>
-                            <Form.Control type="text" placeholder="Class" />
+                            <Form.Control type="text" id="createSubject" placeholder="Class" />
                         </Form.Group>
                         <Form.Group style={{ marginLeft: "2%" }}>
                             <Form.Label>Title</Form.Label>
-                            <Form.Control type="textarea" placeholder="Brief Overview" />
+                            <Form.Control type="textarea" id="createTitle" placeholder="Brief Overview" />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row>
                         <Form.Group>
                             <Form.Label>Date</Form.Label>
-                            <Form.Control type="date" value={date} />
+                            <Form.Control type="date" id="createDate" />
                         </Form.Group>
                         <Form.Group style={{ marginLeft: "2%" }}>
                             <Form.Label>Time</Form.Label>
-                            <Form.Control type="time" value={time} />
+                            <Form.Control type="time" id="createTime" />
                         </Form.Group>
                     </Form.Row>
                     <Form.Row>
                         <Form.Group>
                             <Form.Label>Length</Form.Label>
-                            <Form.Control as="select">
+                            <Form.Control as="select" id="createLength">
                                 <option value="15">00:15</option>
                                 <option value="30">00:30</option>
                                 <option value="45">00:45</option>
@@ -263,8 +280,8 @@ function Hour(props) {
         else {
             console.log("not moving")
             document.getElementById("createTask").style.display = "block";
-            selectedDate = props.date;
-            selectedTime = props.hour;
+            document.getElementById("createDate").value = "2021-03-" + props.date;
+            document.getElementById("createTime").value = props.hour + ":00";
         }
     }
 

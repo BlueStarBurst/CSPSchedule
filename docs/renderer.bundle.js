@@ -33261,7 +33261,23 @@ let day = new Date().getDay();
 let [hour, minute, second] = new Date().toLocaleTimeString("en-US").split(/:| /);
 hour = new Date().getHours();
 let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-let timeHeight = 150; // Storage for tutorials 
+let timeHeight = 150;
+
+function createServerTask(e) {
+  e.preventDefault();
+  console.log(e);
+  document.getElementById("createTask").style.display = "none";
+  var JSONpackage = {
+    subject: document.getElementById("createSubject").value,
+    date: document.getElementById("createDate").value,
+    time: document.getElementById("createTime").value,
+    text: document.getElementById("createTitle").value,
+    attendees: "Bryant",
+    len: document.getElementById("createLength").value
+  };
+  server.send(JSON.stringify(JSONpackage));
+} // Storage for tutorials 
+
 
 let weeklyMeetings = [{
   subject: "CS",
@@ -33306,25 +33322,26 @@ function CreateTask(props) {
     "borderRadius": "20px",
     "color": "white"
   };
-  var interval;
-
-  function reset() {
-    clearInterval(interval);
-    interval = null;
-    setCurrent(selectedDate);
+  /*
+    var interval;
+    function reset() {
+      clearInterval(interval);
+      interval = null;
+      setCurrent(selectedDate);
   }
-
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    reset();
-    interval = setInterval(() => {
-      if (current != selectedDate) {
-        reset();
-      }
-    }, 1000);
-  }, [current]);
-  var date = "2021-03-" + selectedDate;
+    useEffect(() => {
+      reset();
+      interval = setInterval(() => {
+          if (current != selectedDate) {
+              reset();
+          }
+      }, 1000);
+  }, [current])
+    var date = "2021-03-" + selectedDate;
   var time = selectedTime + ":00";
   console.log(time);
+  */
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: container,
     id: "createTask",
@@ -33334,8 +33351,11 @@ function CreateTask(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: style,
     id: "form"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default, {
+    onSubmit: createServerTask
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
     type: "text",
+    id: "createSubject",
     placeholder: "Class"
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, {
     style: {
@@ -33343,19 +33363,21 @@ function CreateTask(props) {
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
     type: "textarea",
+    id: "createTitle",
     placeholder: "Brief Overview"
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
     type: "date",
-    value: date
+    id: "createDate"
   })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, {
     style: {
       marginLeft: "2%"
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
     type: "time",
-    value: time
+    id: "createTime"
   }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
-    as: "select"
+    as: "select",
+    id: "createLength"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
     value: "15"
   }, "00:15"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
@@ -33480,8 +33502,8 @@ function Hour(props) {
     } else {
       console.log("not moving");
       document.getElementById("createTask").style.display = "block";
-      selectedDate = props.date;
-      selectedTime = props.hour;
+      document.getElementById("createDate").value = "2021-03-" + props.date;
+      document.getElementById("createTime").value = props.hour + ":00";
     }
   }
 
