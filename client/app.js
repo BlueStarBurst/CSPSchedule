@@ -25,6 +25,38 @@ let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 let timeHeight = 150;
 
 
+server.onopen = (e) => {
+    console.log(e);
+    var mess = {
+        type: "getWeek",
+        month: month,
+        week: Math.floor(date / 7),
+        date: date,
+        year: year
+    }
+    //console.log(mess);
+    server.send(JSON.stringify(mess));
+}
+
+server.onmessage = (message) => {
+    message = JSON.parse(message.data);
+    console.log(message)
+
+    if (message.type = "week") {
+        if (message.data) {
+            weeklyMeetings = message.data;
+        } else {
+            weeklyMeetings = [];
+        }
+        
+    }
+    /*
+    console.log(message)
+    if (message.week == week) {
+        console.log("thisweek");
+    }*/
+}
+
 function createServerTask(e) {
     e.preventDefault();
     console.log(e);
@@ -37,31 +69,28 @@ function createServerTask(e) {
         attendees: "Bryant",
         len: document.getElementById("createLength").value
     }
-    server.send(JSON.stringify(JSONpackage));
+    var moveable = {
+        type: "createTask",
+
+        data: JSONpackage
+    }
+    server.send(JSON.stringify(moveable));
 }
 
 // Storage for tutorials 
 
-let weeklyMeetings = [
-    {
-        subject: "CS",
-        date: "3/19/2021",
-        time: "12",
-        text: "indexing and iteration practice",
-        attendees: "Bryant",
-        len: 60
-    }
-]
+let week = Math.floor(date / 7);
+let weeklyMeetings = []
 
 let subjectStyles = {
     CS: {
         border: "transparent",
         background: "rgba(30, 132, 227, 0.5)"
+    },
+    default: {
+        border: "transparent",
+        background: "rgba(255, 251, 0, 0.5)"
     }
-}
-
-server.onopen = () => {
-    console.log(date)
 }
 
 var selectedDate;
@@ -91,31 +120,6 @@ function CreateTask(props) {
         "borderRadius": "20px",
         "color": "white"
     }
-
-    /*
-
-    var interval;
-
-    function reset() {
-        clearInterval(interval);
-        interval = null;
-        setCurrent(selectedDate);
-    }
-
-    useEffect(() => {
-        reset();
-        interval = setInterval(() => {
-            if (current != selectedDate) {
-                reset();
-            }
-        }, 1000);
-    }, [current])
-
-    var date = "2021-03-" + selectedDate;
-    var time = selectedTime + ":00";
-    console.log(time);
-*/
-
 
     return (
         <div style={container} id="createTask" onClick={function (e) {
@@ -171,66 +175,6 @@ function CreateTask(props) {
             </div>
         </div>
     )
-
-    /*
-    return (
-        <div style={container} id="createTask">
-            <div style={style}>
-                <h5>Schedule a meeting!</h5>
-                <br />
-                <InputGroup style={input}>
-                    <InputGroup.Prepend>
-                        <InputGroup.Text id="basic-addon1">Title</InputGroup.Text>
-                    </InputGroup.Prepend>
-                    <FormControl
-                        placeholder="Title"
-                        aria-label="Title"
-                        aria-describedby="basic-addon1"
-                    />
-                </InputGroup>
-                <br />
-                <InputGroup style={input}>
-                    <InputGroup.Prepend>
-                        <InputGroup.Text id="basic-addon1">Subject</InputGroup.Text>
-                    </InputGroup.Prepend>
-                    <FormControl
-                        placeholder="Class"
-                        aria-label="Class"
-                        aria-describedby="basic-addon1"
-                    />
-                </InputGroup>
-                <br />
-                <InputGroup style={input}>
-                    <InputGroup.Prepend>
-                        <InputGroup.Text id="basic-addon1">Date</InputGroup.Text>
-                    </InputGroup.Prepend>
-                    <input type="date" id="start" name="trip-start"
-                        value={date} />
-                    <input type="time" id="appt" name="appt" value={time}
-                        min="09:00" max="18:00" required />
-                </InputGroup>
-                <br />
-                <InputGroup style={input}>
-                    <InputGroup.Prepend>
-                        <InputGroup.Text id="basic-addon1">Length</InputGroup.Text>
-                    </InputGroup.Prepend>
-                    <select>
-                        <option value="15">00:15</option>
-                        <option value="30">00:30</option>
-                        <option value="45">00:45</option>
-                        <option value="60">01:00</option>
-                        <option value="75">01:15</option>
-                        <option value="90">01:30</option>
-                        <option value="105">01:45</option>
-                        <option value="120">02:00</option>
-                    </select>
-                    <InputGroup.Append>
-                        <Button>Submit!</Button>
-                    </InputGroup.Append>
-                </InputGroup>
-            </div>
-        </div>
-    )*/
 }
 
 function Task(props) {
@@ -238,17 +182,24 @@ function Task(props) {
     console.log(props.meeting)
     console.log(timeHeight * (props.meeting.len / 60) + "px")
 
-    useEffect(() => {
+    var sub;
 
-    }, [timeHeight])
+    if (subjectStyles[props.meeting.subject]) {
+        sub = subjectStyles[props.meeting.subject];
+    } else {
+        sub = subjectStyles.default;
+    }
 
     var style = {
-        "backgroundColor": subjectStyles[props.meeting.subject].background,
+        "backgroundColor": sub.background,
         "display": "block",
         "height": timeHeight * (props.meeting.len / 60) - 3 + "px",
         "borderRadius": "10px",
-        "border": "2px " + subjectStyles[props.meeting.subject].border + " solid",
+        "border": "2px " + sub.border + " solid",
+        "overflow": "auto"
     }
+
+
 
     return (
         <div style={style} className="task">
@@ -266,9 +217,11 @@ function Hour(props) {
     var text = "";
     var id = "";
 
+    console.log(weeklyMeetings);
     for (var i = 0; i < weeklyMeetings.length; i++) {
-        if (props.date == weeklyMeetings[i].date.split("/")[1] && props.hour == weeklyMeetings[i].time) {
-            console.log("HJASFDHJXCL");
+        //console.log(props.hour + " " + weeklyMeetings[i].time);
+        if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0,2)) {
+            //console.log("asjhfxzkjlcvh");
             text = <Task meeting={weeklyMeetings[i]} />
         }
     }
@@ -313,6 +266,26 @@ function Header(props) {
 
 function Week(props) {
 
+    const [meetings, setMeetings] = useState(weeklyMeetings);
+
+    var interval;
+
+    function reset() {
+        clearInterval(interval);
+        interval = null;
+        setMeetings(weeklyMeetings);
+        console.log(weeklyMeetings);
+    }
+
+    useEffect(() => {
+        reset();
+        interval = setInterval(() => {
+            if (meetings != weeklyMeetings) {
+                reset();
+            }
+        }, 1000);
+    })
+
     return (
         <div className="week">
             <Header date={props.date} />
@@ -335,7 +308,7 @@ function Week(props) {
 
                             var id = "";
 
-                            console.log(hour + " " + time);
+                            //console.log(hour + " " + time);
                             if ((props.date == date && parseInt(hour) == time) || (hour >= 21 && time == 20)) {
                                 id = "scroll";
                             }

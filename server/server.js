@@ -20,8 +20,8 @@ const port = process.env.PORT || 26950;
 //initialize a http server
 const server = https.createServer(serverConfig, app);
 
-capp.get('/', function(req, res) {
-  res.sendFile(path.join(__dirname,'..') + '/docs/index.html');
+capp.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, '..') + '/docs/index.html');
 });
 
 capp.use(express.static('docs'))
@@ -31,15 +31,16 @@ httpsServer.listen(HTTPS_PORT, '0.0.0.0');
 
 
 http.createServer(function (req, res) {
-    res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
-    res.end();
+  res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+  res.end();
 }).listen(80);
 
 
 //initialize the WebSocket server instance
 const wss = new WebSocket.Server({ server });
 
-let users = {};
+let users = [];
+let schedule = {};
 
 const sendTo = (connection, message) => {
   connection.send(JSON.stringify(message));
@@ -58,15 +59,76 @@ const sendToAll = (clients, type, { id, name: userName }) => {
   });
 };
 
-wss.on("connection", ws => {
-  ws.on("message", msg => {
-    console.log(msg);
+function findWeek(year, month, week) {
+  var arr = [];
+  if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
+    arr = schedule[year][month][week];
+  } else {
+    if (!schedule[year]) {
+      schedule[year] = {}
+    }
+    if (!schedule[year][month]) {
+      schedule[year][month] = {}
+    }
+    if (!schedule[year][month][week]) {
+      schedule[year][month][week] = []
+    }
+  }
+  var returnMessage = {
+    type: "week",
+    data: arr
+  }
+  //return JSON.stringify(returnMessage);
+  console.log(users);
+  users.forEach(element => {
+    element.send(JSON.stringify(returnMessage));
   });
-  ws.on("close", function() {
+}
+
+wss.on("connection", ws => {
+
+  users.push(ws);
+
+  ws.on("message", msg => {
+    let data = JSON.parse(msg);
+    console.log(data);
+    if (data.type == "getWeek") {
+      findWeek(data.year,data.month,data.week);
+      //ws.send(findWeek(data.year,data.month,data.week));
+    }
+    else if (data.type == "createTask") {
+
+      console.log(schedule);
+
+      var [year, month, week] = data.data.date.split("-");
+      week = Math.floor(week/7);
+      month = parseInt(month);
+
+      if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
+        schedule[year][month][week].push(data.data);
+      }
+
+      console.log(schedule[year][month][week]);
+
+      findWeek(year,month,week);
+
+      //ws.send(findWeek(year,month,week));
+      
+      /*
+      var returnMessage = {
+        type: "week",
+        data: arr
+      }
+      ws.send(JSON.stringify(returnMessage))*/
+    }
+
+  });
+
+  ws.on("close", function () {
     delete users[ws.name];
     sendToAll(users, "leave", ws);
   });
-  //send immediatly a feedback to the incoming connection
+
   ws.send(
     JSON.stringify({
       type: "connect",
