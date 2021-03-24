@@ -26,7 +26,6 @@ let timeHeight = 150;
 
 
 server.onopen = (e) => {
-    console.log(e);
     var mess = {
         type: "getWeek",
         month: month,
@@ -34,7 +33,6 @@ server.onopen = (e) => {
         date: date,
         year: year
     }
-    //console.log(mess);
     server.send(JSON.stringify(mess));
 }
 
@@ -50,16 +48,10 @@ server.onmessage = (message) => {
         }
         
     }
-    /*
-    console.log(message)
-    if (message.week == week) {
-        console.log("thisweek");
-    }*/
 }
 
 function createServerTask(e) {
     e.preventDefault();
-    console.log(e);
     document.getElementById("createTask").style.display = "none";
     var JSONpackage = {
         subject: document.getElementById("createSubject").value,
@@ -179,8 +171,8 @@ function CreateTask(props) {
 
 function Task(props) {
 
-    console.log(props.meeting)
-    console.log(timeHeight * (props.meeting.len / 60) + "px")
+    //console.log(props.meeting)
+    //console.log(timeHeight * (props.meeting.len / 60) + "px")
 
     var sub;
 
@@ -190,10 +182,14 @@ function Task(props) {
         sub = subjectStyles.default;
     }
 
+    var topHeight = (parseInt(props.meeting.time.substr(3)) / 60) * timeHeight;
+    //console.log(topHeight);
+
     var style = {
         "backgroundColor": sub.background,
         "display": "block",
         "height": timeHeight * (props.meeting.len / 60) - 3 + "px",
+        "marginTop": topHeight + "px",
         "borderRadius": "10px",
         "border": "2px " + sub.border + " solid",
         "overflow": "auto"
@@ -206,9 +202,7 @@ function Task(props) {
     return (
         <div style={style} className="task" onClick={clicks}>
             <p>{props.meeting.text}</p>
-            <div>
-                <p>Attendees: {props.meeting.attendees} </p>
-            </div>
+            <p>Attendees: {props.meeting.attendees} </p>
         </div>
     )
 }
@@ -218,11 +212,10 @@ function Hour(props) {
     var text = "";
     var id = "";
 
-    console.log(weeklyMeetings);
     for (var i = 0; i < weeklyMeetings.length; i++) {
-        //console.log(props.hour + " " + weeklyMeetings[i].time);
+
         if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0,2)) {
-            //console.log("asjhfxzkjlcvh");
+
             text = <Task meeting={weeklyMeetings[i]} />
         }
     }
@@ -231,11 +224,7 @@ function Hour(props) {
         if (e.target.className != "hour") {
             return;
         }
-        if (click > 100 || moving) {
-            console.log("moving");
-        }
-        else {
-            console.log("not moving")
+        if (click <= 100 && !moving) {
             document.getElementById("createTask").style.display = "block";
             document.getElementById("createDate").value = "2021-03-" + props.date;
             document.getElementById("createTime").value = props.hour + ":00";
@@ -278,7 +267,6 @@ function Week(props) {
         clearInterval(interval);
         interval = null;
         setMeetings(weeklyMeetings);
-        console.log(weeklyMeetings);
     }
 
     useEffect(() => {
@@ -292,6 +280,7 @@ function Week(props) {
 
     return (
         <div className="week">
+            <div className="overlayTop"/>
             <Header date={props.date} />
             <div className="schedule" onMouseDown={swipe} id="schedule">
                 <div id={"currentTime"} className="currentTime" />
@@ -312,7 +301,6 @@ function Week(props) {
 
                             var id = "";
 
-                            //console.log(hour + " " + time);
                             if ((props.date == date && parseInt(hour) == time) || (hour >= 21 && time == 20)) {
                                 id = "scroll";
                             }
@@ -335,6 +323,7 @@ function Week(props) {
                     </tbody>
                 </Table>
             </div>
+            
         </div>
     );
 }
@@ -366,7 +355,6 @@ function swipe(e) {
     mouse = [e.clientX, e.clientY];
     prev[0] = document.getElementById("schedule").scrollLeft;
     prev[1] = document.getElementById("schedule").scrollTop;
-    //console.log(e);
 }
 
 render(
@@ -400,7 +388,6 @@ document.onmousedown = function () {
 document.onmousemove = function (e) {
     moving = true;
     if (mouse != null) {
-        //console.log((e.clientX - mouse[0]) + " " + (e.clientY - mouse[1]))
         if (Math.abs(e.clientX - mouse[0]) > Math.abs(e.clientY - mouse[1])) {
             document.getElementById("schedule").scroll(-1 * (e.clientX - mouse[0]) + prev[0], prev[1]);
         }
@@ -416,15 +403,6 @@ setInterval(() => {
     second = new Date().getSeconds();
     minute = new Date().getMinutes();
 
-    /*
-    if (document.getElementById("scroll")) {
-                console.log("schedule: " + document.getElementById("schedule").scrollTop);
-        console.log("scroll: " + document.getElementById("scroll").offsetTop);
-    }*/
-    //console.log(timeHeight)
-
-
-
     var hourDist = (hour - 8) * timeHeight;
     var minDist = (minute / 60) * timeHeight;
     var secDist = (timeHeight / 60) * (second / 60);
@@ -436,13 +414,7 @@ setInterval(() => {
         totalDist = 0;
     }
 
-
-
-    //console.log(hourDist / timeHeight + "%");
-
-    //moveCurrentTime(totalDist);
     document.getElementById("currentTime").style.top = totalDist + "px";
-    //console.log(document.getElementById("currentTime").style.top);
 
 }, 100);
 
@@ -456,7 +428,6 @@ function moveCurrentTime(totalDist) {
 
     var distance = totalDist - current;
 
-    //console.log(distance);
     if (distance <= 1) {
         document.getElementById("currentTime").style.top = totalDist + "px";
         return;
@@ -477,6 +448,5 @@ setTimeout(() => {
 
     document.getElementById("currentTime").style.opacity = "1";
     document.getElementById("currentTime").classList.add("currentTimeAnim");
-    //console.log(document.getElementById("currentTime").classList);
 
 }, 1000);

@@ -141,7 +141,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "html {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n  background-color: rgba(20, 20, 20, 255);\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.1)\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: red;\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes slideUp {\r\n  0% { transform: translateY(100%); opacity: 0;}\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 3px 2% 0 2%;\r\n  width: 96%;\r\n  display: block;\r\n  z-index: 10000;\r\n  animation: slideUp 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n  z-index: 10000;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"AAAA;EACE,uBAAuB;EACvB,cAAc;EACd;AACF;;AAEA;EACE,yBAAyB;EACzB,sBAAsB;EACtB,qBAAqB;EACrB,iBAAiB;AACnB;;AAEA;EACE,iBAAiB;EACjB,wBAAwB;EACxB,oBAAoB;EACpB,2BAA2B;EAC3B,yBAAyB;AAC3B;;AAEA;EACE,uBAAuB;EACvB,cAAc;AAChB;AACA;EACE,uBAAuB;EACvB,cAAc;AAChB;;;;AAIA;EACE,YAAY;EACZ,UAAU;EACV,kBAAkB;AACpB;;;;AAIA;EACE,mBAAmB;EACnB,SAAS;EACT,UAAU;EACV,yBAAyB;EACzB,yBAAyB;EACzB,iBAAiB;EACjB,MAAM;EACN,WAAW;AACb;;AAEA;EACE,wCAAwC;EACxC,YAAY;EACZ,qBAAqB;EACrB,oBAAoB;EACpB,uCAAuC;AACzC;;AAEA;EACE,iBAAiB;EACjB,SAAS;EACT,UAAU;AACZ;;AAEA;EACE,YAAY;EACZ,kBAAkB;EAClB,SAAS;EACT,YAAY;EACZ,gBAAgB;EAChB,qBAAqB;AACvB;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;;AAGA;EACE;AACF;;AAEA;EACE,SAAS;EACT,UAAU;AACZ;;AAEA;EACE,SAAS;EACT,mBAAmB;AACrB;;AAEA;EACE,kBAAkB;EAClB,yBAAyB;EACzB,oCAAoC;EACpC,UAAU;AACZ;;AAEA;EACE,8BAA8B;EAC9B,6BAA6B;AAC/B;;AAEA;EACE,aAAa;EACb,MAAM;EACN,SAAS;EACT,UAAU;AACZ;;AAEA;EACE,kBAAkB;EAClB,WAAW;EACX,WAAW;EACX,qBAAqB;EACrB,UAAU;AACZ;;AAEA;EACE,gCAAgC;AAClC;;AAEA;EACE,KAAK,6BAA6B,EAAE,UAAU,CAAC;EAC/C,OAAO,yBAAyB,EAAE,UAAU,EAAE;AAChD;;AAEA;EACE,KAAK,2BAA2B,EAAE,UAAU,CAAC;EAC7C,OAAO,yBAAyB,EAAE;AACpC;;AAEA;EACE,6BAA6B;AAC/B;;AAEA;EACE,YAAY;EACZ,mBAAmB;EACnB,UAAU;EACV,cAAc;EACd,cAAc;EACd,qBAAqB;AACvB;;AAEA;EACE,eAAe;EACf,UAAU;EACV,cAAc;AAChB","sourcesContent":["html {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n  background-color: rgba(20, 20, 20, 255);\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.1)\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: red;\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes slideUp {\r\n  0% { transform: translateY(100%); opacity: 0;}\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 3px 2% 0 2%;\r\n  width: 96%;\r\n  display: block;\r\n  z-index: 10000;\r\n  animation: slideUp 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n  z-index: 10000;\r\n}"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "html {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n  \r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.1)\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes slideUp {\r\n  0% { transform: translateY(100%); opacity: 0;}\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 0 2% 0 2%;\r\n  width: 96%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: slideUp 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"AAAA;EACE,uBAAuB;EACvB,cAAc;EACd;AACF;;AAEA;EACE,yBAAyB;EACzB,sBAAsB;EACtB,qBAAqB;EACrB,iBAAiB;AACnB;;AAEA;EACE,iBAAiB;EACjB,wBAAwB;EACxB,oBAAoB;EACpB,2BAA2B;EAC3B,yBAAyB;AAC3B;;AAEA;EACE,uBAAuB;EACvB,cAAc;AAChB;AACA;EACE,uBAAuB;EACvB,cAAc;AAChB;;;;AAIA;EACE,YAAY;EACZ,UAAU;EACV,kBAAkB;AACpB;;;;AAIA;EACE,mBAAmB;EACnB,SAAS;EACT,UAAU;EACV,yBAAyB;EACzB,yBAAyB;EACzB,iBAAiB;EACjB,MAAM;EACN,WAAW;AACb;;AAEA;EACE,wCAAwC;EACxC,YAAY;EACZ,qBAAqB;EACrB,oBAAoB;;AAEtB;;AAEA;EACE,iBAAiB;EACjB,SAAS;EACT,UAAU;AACZ;;AAEA;EACE,YAAY;EACZ,kBAAkB;EAClB,SAAS;EACT,YAAY;EACZ,gBAAgB;EAChB,qBAAqB;AACvB;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;;AAGA;EACE;AACF;;AAEA;EACE,SAAS;EACT,UAAU;EACV,kBAAkB;AACpB;;AAEA;EACE,QAAQ;EACR,kBAAkB;EAClB,WAAW;EACX,aAAa;EACb,2HAA2H;EAC3H,mBAAmB;AACrB;;AAEA;EACE,SAAS;EACT,mBAAmB;AACrB;;AAEA;EACE,kBAAkB;EAClB,yBAAyB;EACzB,oCAAoC;EACpC,UAAU;AACZ;;AAEA;EACE,8BAA8B;EAC9B,6BAA6B;AAC/B;;AAEA;EACE,aAAa;EACb,MAAM;EACN,SAAS;EACT,UAAU;EACV,kBAAkB;AACpB;;AAEA;EACE,kBAAkB;EAClB,WAAW;EACX,WAAW;EACX,sCAAsC;EACtC,UAAU;AACZ;;AAEA;EACE,gCAAgC;AAClC;;AAEA;EACE,KAAK,6BAA6B,EAAE,UAAU,CAAC;EAC/C,OAAO,yBAAyB,EAAE,UAAU,EAAE;AAChD;;AAEA;EACE,KAAK,2BAA2B,EAAE,UAAU,CAAC;EAC7C,OAAO,yBAAyB,EAAE;AACpC;;AAEA;EACE,6BAA6B;AAC/B;;AAEA;EACE,YAAY;EACZ,iBAAiB;EACjB,UAAU;EACV,YAAY;EACZ,cAAc;EACd,kBAAkB;EAClB,qBAAqB;AACvB;;AAEA;EACE,eAAe;EACf,UAAU;AACZ","sourcesContent":["html {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n  \r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.1)\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes slideUp {\r\n  0% { transform: translateY(100%); opacity: 0;}\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 0 2% 0 2%;\r\n  width: 96%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: slideUp 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -33264,15 +33264,13 @@ let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "S
 let timeHeight = 150;
 
 server.onopen = e => {
-  console.log(e);
   var mess = {
     type: "getWeek",
     month: month,
     week: Math.floor(date / 7),
     date: date,
     year: year
-  }; //console.log(mess);
-
+  };
   server.send(JSON.stringify(mess));
 };
 
@@ -33287,17 +33285,10 @@ server.onmessage = message => {
       weeklyMeetings = [];
     }
   }
-  /*
-  console.log(message)
-  if (message.week == week) {
-      console.log("thisweek");
-  }*/
-
 };
 
 function createServerTask(e) {
   e.preventDefault();
-  console.log(e);
   document.getElementById("createTask").style.display = "none";
   var JSONpackage = {
     subject: document.getElementById("createSubject").value,
@@ -33417,8 +33408,8 @@ function CreateTask(props) {
 }
 
 function Task(props) {
-  console.log(props.meeting);
-  console.log(timeHeight * (props.meeting.len / 60) + "px");
+  //console.log(props.meeting)
+  //console.log(timeHeight * (props.meeting.len / 60) + "px")
   var sub;
 
   if (subjectStyles[props.meeting.subject]) {
@@ -33427,10 +33418,13 @@ function Task(props) {
     sub = subjectStyles.default;
   }
 
+  var topHeight = parseInt(props.meeting.time.substr(3)) / 60 * timeHeight; //console.log(topHeight);
+
   var style = {
     "backgroundColor": sub.background,
     "display": "block",
     "height": timeHeight * (props.meeting.len / 60) - 3 + "px",
+    "marginTop": topHeight + "px",
     "borderRadius": "10px",
     "border": "2px " + sub.border + " solid",
     "overflow": "auto"
@@ -33444,18 +33438,15 @@ function Task(props) {
     style: style,
     className: "task",
     onClick: clicks
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, props.meeting.text), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Attendees: ", props.meeting.attendees, " ")));
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, props.meeting.text), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Attendees: ", props.meeting.attendees, " "));
 }
 
 function Hour(props) {
   var text = "";
   var id = "";
-  console.log(weeklyMeetings);
 
   for (var i = 0; i < weeklyMeetings.length; i++) {
-    //console.log(props.hour + " " + weeklyMeetings[i].time);
     if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2)) {
-      //console.log("asjhfxzkjlcvh");
       text = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Task, {
         meeting: weeklyMeetings[i]
       });
@@ -33467,10 +33458,7 @@ function Hour(props) {
       return;
     }
 
-    if (click > 100 || moving) {
-      console.log("moving");
-    } else {
-      console.log("not moving");
+    if (click <= 100 && !moving) {
       document.getElementById("createTask").style.display = "block";
       document.getElementById("createDate").value = "2021-03-" + props.date;
       document.getElementById("createTime").value = props.hour + ":00";
@@ -33510,7 +33498,6 @@ function Week(props) {
     clearInterval(interval);
     interval = null;
     setMeetings(weeklyMeetings);
-    console.log(weeklyMeetings);
   }
 
   (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
@@ -33523,7 +33510,9 @@ function Week(props) {
   });
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "week"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Header, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "overlayTop"
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Header, {
     date: props.date
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "schedule",
@@ -33549,7 +33538,7 @@ function Week(props) {
       num = num + " AM";
     }
 
-    var id = ""; //console.log(hour + " " + time);
+    var id = "";
 
     if (props.date == date && parseInt(hour) == time || hour >= 21 && time == 20) {
       id = "scroll";
@@ -33609,7 +33598,7 @@ var prev = [0, 0];
 function swipe(e) {
   mouse = [e.clientX, e.clientY];
   prev[0] = document.getElementById("schedule").scrollLeft;
-  prev[1] = document.getElementById("schedule").scrollTop; //console.log(e);
+  prev[1] = document.getElementById("schedule").scrollTop;
 }
 
 (0,react_dom__WEBPACK_IMPORTED_MODULE_1__.render)( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(UI, null)), document.getElementById("root"));
@@ -33639,7 +33628,6 @@ document.onmousemove = function (e) {
   moving = true;
 
   if (mouse != null) {
-    //console.log((e.clientX - mouse[0]) + " " + (e.clientY - mouse[1]))
     if (Math.abs(e.clientX - mouse[0]) > Math.abs(e.clientY - mouse[1])) {
       document.getElementById("schedule").scroll(-1 * (e.clientX - mouse[0]) + prev[0], prev[1]);
     } else {
@@ -33652,13 +33640,6 @@ setInterval(() => {
   hour = new Date().getHours();
   second = new Date().getSeconds();
   minute = new Date().getMinutes();
-  /*
-  if (document.getElementById("scroll")) {
-              console.log("schedule: " + document.getElementById("schedule").scrollTop);
-      console.log("scroll: " + document.getElementById("scroll").offsetTop);
-  }*/
-  //console.log(timeHeight)
-
   var hourDist = (hour - 8) * timeHeight;
   var minDist = minute / 60 * timeHeight;
   var secDist = timeHeight / 60 * (second / 60);
@@ -33668,11 +33649,9 @@ setInterval(() => {
     totalDist = 14 * timeHeight;
   } else if (hour < 8) {
     totalDist = 0;
-  } //console.log(hourDist / timeHeight + "%");
-  //moveCurrentTime(totalDist);
+  }
 
-
-  document.getElementById("currentTime").style.top = totalDist + "px"; //console.log(document.getElementById("currentTime").style.top);
+  document.getElementById("currentTime").style.top = totalDist + "px";
 }, 100);
 
 function moveCurrentTime(totalDist) {
@@ -33682,7 +33661,7 @@ function moveCurrentTime(totalDist) {
     document.getElementById("currentTime").style.top = "0px";
   }
 
-  var distance = totalDist - current; //console.log(distance);
+  var distance = totalDist - current;
 
   if (distance <= 1) {
     document.getElementById("currentTime").style.top = totalDist + "px";
@@ -33701,7 +33680,7 @@ setTimeout(() => {
   });
   timeHeight = document.getElementById("scroll").offsetHeight;
   document.getElementById("currentTime").style.opacity = "1";
-  document.getElementById("currentTime").classList.add("currentTimeAnim"); //console.log(document.getElementById("currentTime").classList);
+  document.getElementById("currentTime").classList.add("currentTimeAnim");
 }, 1000);
 })();
 

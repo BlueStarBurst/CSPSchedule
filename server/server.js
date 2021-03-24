@@ -40,7 +40,21 @@ http.createServer(function (req, res) {
 const wss = new WebSocket.Server({ server });
 
 let users = new Map();
+
 let schedule = {};
+try {
+  schedule = JSON.parse(fs.readFileSync(__dirname + '/schedule.json', 'utf8'));
+} catch (err) {
+  saveSchedule();
+}
+
+
+function saveSchedule() {
+  fs.writeFile(__dirname + '/schedule.json', JSON.stringify(schedule), function (err) {
+    if (err) throw err;
+    console.log('Saved!');
+  });
+}
 
 const sendTo = (connection, message) => {
   connection.send(JSON.stringify(message));
@@ -83,6 +97,8 @@ function findWeek(year, month, week) {
   for (element of users.values()) {
     element.send(JSON.stringify(returnMessage));
   }
+
+  saveSchedule();
 }
 
 wss.on("connection", ws => {
