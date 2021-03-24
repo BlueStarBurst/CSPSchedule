@@ -3,10 +3,10 @@ const WebSocket = require("ws");
 const fs = require('fs');
 const http = require("http");
 const https = require('https');
-const { v4: uuidv4 } = require('uuid');
 const app = express();
 const capp = express();
 var path = require('path');
+var {v4:uuidv4} = require('uuid');
 
 const serverConfig = {
   key: fs.readFileSync(__dirname + '/key.pem'),
@@ -39,7 +39,7 @@ http.createServer(function (req, res) {
 //initialize the WebSocket server instance
 const wss = new WebSocket.Server({ server });
 
-let users = [];
+let users = new Map();
 let schedule = {};
 
 const sendTo = (connection, message) => {
@@ -62,7 +62,7 @@ const sendToAll = (clients, type, { id, name: userName }) => {
 function findWeek(year, month, week) {
   var arr = [];
   if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
-    arr = schedule[year][month][week];
+    arr = Object.values(schedule[year][month][week]);
   } else {
     if (!schedule[year]) {
       schedule[year] = {}
@@ -71,7 +71,7 @@ function findWeek(year, month, week) {
       schedule[year][month] = {}
     }
     if (!schedule[year][month][week]) {
-      schedule[year][month][week] = []
+      schedule[year][month][week] = {}
     }
   }
   var returnMessage = {
@@ -79,47 +79,57 @@ function findWeek(year, month, week) {
     data: arr
   }
   //return JSON.stringify(returnMessage);
-  console.log(users);
-  users.forEach(element => {
+  //console.log(users);
+  for (element of users.values()) {
     element.send(JSON.stringify(returnMessage));
-  });
+  }
 }
 
 wss.on("connection", ws => {
 
-  users.push(ws);
+  ws.name = uuidv4();
+  users.set(ws.name, ws);
+  //console.log(users);
 
   ws.on("message", msg => {
-    let data = JSON.parse(msg);
-    console.log(data);
-    if (data.type == "getWeek") {
-      findWeek(data.year,data.month,data.week);
-      //ws.send(findWeek(data.year,data.month,data.week));
+    let data;
+
+    try {
+      data = JSON.parse(msg);
+    } catch (e) {
+      console.log("Invalid JSON");
+      data = {};
     }
-    else if (data.type == "createTask") {
 
-      console.log(schedule);
+    switch (data.type) {
+      case "getWeek":
+        findWeek(data.year, data.month, data.week);
+        break;
+      case "createTask":
+        console.log(schedule);
+        console.log(data.data);
 
-      var [year, month, week] = data.data.date.split("-");
-      week = Math.floor(week/7);
-      month = parseInt(month);
+        var [year, month, week] = data.data.date.split("-");
+        week = Math.floor(week / 7);
+        month = parseInt(month);
 
-      if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
-        schedule[year][month][week].push(data.data);
-      }
+        var id = Math.floor(Math.random() * Math.floor(1000));
 
-      console.log(schedule[year][month][week]);
+        if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
+          while(schedule[year][month][week][id] != undefined) {
+            id = Math.floor(Math.random() * Math.floor(1000));
+          }
+          schedule[year][month][week][id] = data.data;
+          schedule[year][month][week][id].id = id;
+        }
 
-      findWeek(year,month,week);
+        console.log(schedule[year][month][week]);
 
-      //ws.send(findWeek(year,month,week));
-      
-      /*
-      var returnMessage = {
-        type: "week",
-        data: arr
-      }
-      ws.send(JSON.stringify(returnMessage))*/
+        findWeek(year, month, week);
+        break;
+      default: 
+        console.log("uh oh! That's not a valid request!");
+        break;
     }
 
   });

@@ -76,6 +76,10 @@ tr {
   display: none;
 }
 
+.task::-webkit-scrollbar {
+  display: none;
+}
+
 
 .highlighted {
   background-color: rgba(255, 255, 255, 0.1)
@@ -127,6 +131,11 @@ tr {
   100% { transform: translateY(0%); opacity: 1; }
 }
 
+@keyframes slideUp {
+  0% { transform: translateY(100%); opacity: 0;}
+  100% { transform: translateY(0%); }
+}
+
 .header {
   background-color: transparent;
 }
@@ -137,6 +146,7 @@ tr {
   width: 96%;
   display: block;
   z-index: 10000;
+  animation: slideUp 2s;
 }
 
 .task:hover {

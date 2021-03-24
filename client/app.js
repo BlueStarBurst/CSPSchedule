@@ -199,14 +199,15 @@ function Task(props) {
         "overflow": "auto"
     }
 
-
+    function clicks(e) {
+        e.preventDefault();
+    }
 
     return (
-        <div style={style} className="task">
+        <div style={style} className="task" onClick={clicks}>
             <p>{props.meeting.text}</p>
             <div>
-                <p>Attendees:</p>
-                <p>{props.meeting.attendees}</p>
+                <p>Attendees: {props.meeting.attendees} </p>
             </div>
         </div>
     )
@@ -227,6 +228,9 @@ function Hour(props) {
     }
 
     function selectHour(e) {
+        if (e.target.className != "hour") {
+            return;
+        }
         if (click > 100 || moving) {
             console.log("moving");
         }
