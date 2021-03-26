@@ -10,7 +10,6 @@ import Form from 'react-bootstrap/Form'
 
 import "./style.css"
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { toInteger } from 'lodash-es';
 
 var server = new WebSocket("wss://blueserver.us.to:26950/");
 //var server = new WebSocket("wss://47.184.193.193:26950/");
@@ -23,6 +22,10 @@ hour = new Date().getHours();
 let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
 let timeHeight = 150;
+
+var loading = false;
+
+
 
 
 server.onopen = (e) => {
@@ -46,27 +49,8 @@ server.onmessage = (message) => {
         } else {
             weeklyMeetings = [];
         }
-        
-    }
-}
 
-function createServerTask(e) {
-    e.preventDefault();
-    document.getElementById("createTask").style.display = "none";
-    var JSONpackage = {
-        subject: document.getElementById("createSubject").value,
-        date: document.getElementById("createDate").value,
-        time: document.getElementById("createTime").value,
-        text: document.getElementById("createTitle").value,
-        attendees: "Bryant",
-        len: document.getElementById("createLength").value
     }
-    var moveable = {
-        type: "createTask",
-
-        data: JSONpackage
-    }
-    server.send(JSON.stringify(moveable));
 }
 
 // Storage for tutorials 
@@ -90,8 +74,6 @@ var selectedTime;
 
 function CreateTask(props) {
 
-    const [current, setCurrent] = useState(selectedDate);
-
     var container = {
         "position": "fixed",
         "width": "100vw",
@@ -112,6 +94,26 @@ function CreateTask(props) {
         "borderRadius": "20px",
         "color": "white"
     }
+
+    function createServerTask(e) {
+        e.preventDefault();
+        document.getElementById("createTask").style.display = "none";
+        var JSONpackage = {
+            subject: document.getElementById("createSubject").value,
+            date: document.getElementById("createDate").value,
+            time: document.getElementById("createTime").value,
+            text: document.getElementById("createTitle").value,
+            attendees: "Guest",
+            len: document.getElementById("createLength").value
+        }
+        var moveable = {
+            type: "createTask",
+
+            data: JSONpackage
+        }
+        server.send(JSON.stringify(moveable));
+    }
+
 
     return (
         <div style={container} id="createTask" onClick={function (e) {
@@ -169,6 +171,127 @@ function CreateTask(props) {
     )
 }
 
+var selectedMeeting;
+function EditTask(props) {
+
+    var container = {
+        "position": "fixed",
+        "width": "100vw",
+        "height": "100vh",
+        "top": "0",
+        "left": "0",
+        "backgroundColor": "rgba(0, 0, 0, 0.5)",
+        "zIndex": "200",
+        "display": "none"
+    }
+
+    var style = {
+        "width": "500px",
+        "height": "auto",
+        "backgroundColor": "rgb(25, 25, 25)",
+        "margin": "20vh auto",
+        "padding": "40px",
+        "borderRadius": "20px",
+        "color": "white"
+    }
+
+    function editServerTask(e) {
+        document.getElementById("editTask").style.display = "none";
+        e.preventDefault();
+        document.getElementById("editTask").style.display = "none";
+        var JSONpackage = {
+            id: selectedMeeting.id,
+            subject: document.getElementById("editSubject").value,
+            date: document.getElementById("editDate").value,
+            time: document.getElementById("editTime").value,
+            text: document.getElementById("editTitle").value,
+            attendees: "Guest",
+            len: document.getElementById("editLength").value
+        }
+        var moveable = {
+            type: "editTask",
+            id: selectedMeeting.id,
+            data: JSONpackage
+        }
+        server.send(JSON.stringify(moveable));
+    }
+
+    function removeServerTask(e) {
+        document.getElementById("editTask").style.display = "none";
+        document.getElementById(selectedMeeting.id + "").className = "removed";
+        console.log(document.getElementById(selectedMeeting.id + "").classList);
+        var moveable = {
+            type: "removeTask",
+            date: selectedMeeting.date,
+            id: selectedMeeting.id
+        }
+        server.send(JSON.stringify(moveable));
+    }
+
+    return (
+        <div style={container} id="editTask" onClick={function (e) {
+            if (e.target.id == "editTask")
+                document.getElementById("editTask").style.display = "none";
+        }}>
+            <div style={style} id="form">
+                <div style={{display: "flex", textAlign: "center", margin: "auto"}}>
+                <h5>Schedule a meeting!</h5>     
+                </div>
+                <br />
+                <Form >
+                    <Form.Row>
+                        <Form.Group>
+                            <Form.Label>Subject</Form.Label>
+                            <Form.Control type="text" id="editSubject" placeholder="Class" />
+                        </Form.Group>
+                        <Form.Group style={{ marginLeft: "2%" }}>
+                            <Form.Label>Title</Form.Label>
+                            <Form.Control type="textarea" id="editTitle" placeholder="Brief Overview" />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group>
+                            <Form.Label>Date</Form.Label>
+                            <Form.Control type="date" id="editDate" />
+                        </Form.Group>
+                        <Form.Group style={{ marginLeft: "2%" }}>
+                            <Form.Label>Time</Form.Label>
+                            <Form.Control type="time" id="editTime" />
+                        </Form.Group>
+                    </Form.Row>
+                    <Form.Row>
+                        <Form.Group>
+                            <Form.Label>Length</Form.Label>
+                            <Form.Control as="select" id="editLength">
+                                <option value="15">00:15</option>
+                                <option value="30">00:30</option>
+                                <option value="45">00:45</option>
+                                <option value="60">01:00</option>
+                                <option value="75">01:15</option>
+                                <option value="90">01:30</option>
+                                <option value="105">01:45</option>
+                                <option value="120">02:00</option>
+                            </Form.Control>
+
+                        </Form.Group>
+                        <Form.Group style={{ marginLeft: "2%" }}>
+                            <Form.Label style={{ color: "transparent" }}> uwu </Form.Label>
+                            <br />
+                            <Button onClick={editServerTask} variant="warning" >Update changes</Button>                          
+                        </Form.Group>
+                        <Form.Group style={{ marginLeft: "2%" }}>
+                            <Form.Label style={{ color: "transparent" }}> uwu </Form.Label>
+                            <br />
+                            <Button onClick={removeServerTask} variant="danger" >Remove meeting</Button>
+                        </Form.Group>
+                    </Form.Row>
+                </Form>
+            </div>
+        </div>
+    )
+}
+
+
 function Task(props) {
 
     //console.log(props.meeting)
@@ -197,10 +320,23 @@ function Task(props) {
 
     function clicks(e) {
         e.preventDefault();
+        document.getElementById("editTask").style.display = "block";
+        document.getElementById("editSubject").value = props.meeting.subject;
+        document.getElementById("editTitle").value = props.meeting.text;
+        document.getElementById("editDate").value = props.meeting.date;
+        document.getElementById("editTime").value = props.meeting.time;
+        document.getElementById("editLength").value = props.meeting.len;
+
+        selectedMeeting = props.meeting;
+
+
+        /*
+        document.getElementById("createDate").value = "2021-03-" + props.meeting.date;
+        document.getElementById("createTime").value = props.meeting.hour + ":00";*/
     }
 
     return (
-        <div style={style} className="task" onClick={clicks}>
+        <div style={style} className="task" onClick={clicks} id={props.meeting.id + ""}>
             <p>{props.meeting.text}</p>
             <p>Attendees: {props.meeting.attendees} </p>
         </div>
@@ -214,7 +350,7 @@ function Hour(props) {
 
     for (var i = 0; i < weeklyMeetings.length; i++) {
 
-        if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0,2)) {
+        if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2)) {
 
             text = <Task meeting={weeklyMeetings[i]} />
         }
@@ -233,6 +369,7 @@ function Hour(props) {
 
     return (
         <div className="hour" id={id} onClick={selectHour}>
+            <div className="half"></div>
             {text}
         </div>
     )
@@ -280,7 +417,7 @@ function Week(props) {
 
     return (
         <div className="week">
-            <div className="overlayTop"/>
+            <div className="overlayTop" />
             <Header date={props.date} />
             <div className="schedule" onMouseDown={swipe} id="schedule">
                 <div id={"currentTime"} className="currentTime" />
@@ -323,7 +460,7 @@ function Week(props) {
                     </tbody>
                 </Table>
             </div>
-            
+
         </div>
     );
 }
@@ -344,6 +481,7 @@ function UI(props) {
             <h1>Schedule</h1>
         </div>
         <CreateTask />
+        <EditTask />
         <Week date={date} />
     </div>)
 }

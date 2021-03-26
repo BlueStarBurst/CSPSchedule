@@ -6,7 +6,7 @@ const https = require('https');
 const app = express();
 const capp = express();
 var path = require('path');
-var {v4:uuidv4} = require('uuid');
+var { v4: uuidv4 } = require('uuid');
 
 const serverConfig = {
   key: fs.readFileSync(__dirname + '/key.pem'),
@@ -132,7 +132,7 @@ wss.on("connection", ws => {
         var id = Math.floor(Math.random() * Math.floor(1000));
 
         if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
-          while(schedule[year][month][week][id] != undefined) {
+          while (schedule[year][month][week][id] != undefined) {
             id = Math.floor(Math.random() * Math.floor(1000));
           }
           schedule[year][month][week][id] = data.data;
@@ -143,8 +143,31 @@ wss.on("connection", ws => {
 
         findWeek(year, month, week);
         break;
-      default: 
-        console.log("uh oh! That's not a valid request!");
+      case "editTask":
+        var [year, month, week] = data.data.date.split("-");
+        week = Math.floor(week / 7);
+        month = parseInt(month);
+
+        if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
+          schedule[year][month][week][id] = data.data;
+        }
+        findWeek(year, month, week);
+        break;
+      case "removeTask":
+        var [year, month, week] = data.date.split("-");
+        week = Math.floor(week / 7);
+        month = parseInt(month);
+        var id = data.id;
+
+        if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
+          console.log(schedule[year][month][week][id]);
+          delete schedule[year][month][week][id];
+        }
+        findWeek(year, month, week);
+        break
+      default:
+        console.log("oh no! That's not a valid request!");
+        ws.send(JSON.stringify({error: "oh no! That's not a valid request! /)m(\\"}))
         break;
     }
 

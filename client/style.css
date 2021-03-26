@@ -1,3 +1,8 @@
+::root {
+  --blue: blue;
+}
+
+
 html {
   scroll-behavior: smooth;
   overflow: auto;
@@ -54,7 +59,6 @@ td {
   color: white;
   padding: 0 !important;
   margin: 0 !important;
-  
 }
 
 tr {
@@ -80,9 +84,13 @@ tr {
   display: none;
 }
 
+.removed::-webkit-scrollbar {
+  display: none;
+}
 
 .highlighted {
-  background-color: rgba(255, 255, 255, 0.1)
+  background-color: rgba(255, 255, 255, 0.048);
+  z-index: -1;
 }
 
 .week {
@@ -142,9 +150,25 @@ tr {
   100% { transform: translateY(0%); opacity: 1; }
 }
 
-@keyframes slideUp {
-  0% { transform: translateY(100%); opacity: 0;}
+@keyframes add {
+  0% { transform: translateY(100%); opacity: 0; }
   100% { transform: translateY(0%); }
+}
+
+@keyframes remove {
+  0% { transform: translateY(0%); opacity: 1; }
+  100% { transform: translateY(100%); opacity: 0;}
+}
+
+.removed {
+  animation: remove 2s;
+  opacity: 0;
+  margin: 1% 1% 1% 1%;
+  width: 98%;
+  z-index: 100;
+  display: block;
+  position: absolute;
+  animation: add 2s;
 }
 
 .header {
@@ -153,15 +177,23 @@ tr {
 
 .task {
   opacity: 0.8;
-  margin: 0 2% 0 2%;
-  width: 96%;
+  margin: 1% 1% 1% 1%;
+  width: 98%;
   z-index: 100;
   display: block;
   position: absolute;
-  animation: slideUp 2s;
+  animation: add 2s;
 }
 
 .task:hover {
   cursor: pointer;
   opacity: 1;
+}
+
+.half {
+  position: absolute;
+  top: 50%;
+  height: 1px;
+  width: 100%;
+  border-bottom: 1px rgb(48, 48, 48) dashed;
 }
