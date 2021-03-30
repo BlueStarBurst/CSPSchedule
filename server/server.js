@@ -117,7 +117,8 @@ wss.on("connection", ws => {
       data = {};
     }
 
-    switch (data.type) {
+    const { type, name, offer, answer, candidate, sender } = data;
+    switch (type) {
       case "getWeek":
         findWeek(data.year, data.month, data.week);
         break;
@@ -164,10 +165,88 @@ wss.on("connection", ws => {
           delete schedule[year][month][week][id];
         }
         findWeek(year, month, week);
-        break
+        break;
+
+
+
+
+      //when a user tries to login
+      case "login":
+        //Check if username is available
+        if (users[name]) {
+          sendTo(ws, {
+            type: "login",
+            success: false,
+            message: "Username is unavailable"
+          });
+        } else {
+          const id = uuidv4();
+          const loggedIn = Object.values(
+            users
+          ).map(({ id, name: userName }) => ({ id, userName }));
+          users[name] = ws;
+          ws.name = name;
+          ws.id = id;
+          sendTo(ws, {
+            type: "login",
+            success: true,
+            users: loggedIn
+          });
+          sendToAll(users, "updateUsers", ws);
+        }
+        break;
+      case "offer":
+        //Check if user to send offer to exists
+        const offerRecipient = users[name];
+        if (!!offerRecipient) {
+          sendTo(offerRecipient, {
+            type: "offer",
+            offer,
+            name: ws.name
+          });
+        } else {
+          sendTo(ws, {
+            type: "error",
+            message: `User ${name} does not exist!`
+          });
+        }
+        break;
+      case "answer":
+        //Check if user to send answer to exists
+        const answerRecipient = users[name];
+        if (!!answerRecipient) {
+          sendTo(answerRecipient, {
+            type: "answer",
+            sender: sender,
+            answer,
+          });
+        } else {
+          sendTo(ws, {
+            type: "error",
+            message: `User ${name} or ${sender} does not exist!`
+          });
+        }
+        break;
+      case "candidate":
+        const candidateRecipient = users[name];
+        if (!!candidateRecipient) {
+          sendTo(candidateRecipient, {
+            type: "candidate",
+            sender: sender,
+            candidate: candidate
+          });
+        }
+        break;
+      case "leave":
+        sendToAll(users, "leave", ws);
+        break;
+
+
+
+
       default:
         console.log("oh no! That's not a valid request!");
-        ws.send(JSON.stringify({error: "oh no! That's not a valid request! /)m(\\"}))
+        ws.send(JSON.stringify({ error: "oh no! That's not a valid request! /)m(\\" }))
         break;
     }
 

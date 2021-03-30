@@ -11,6 +11,8 @@ import Form from 'react-bootstrap/Form'
 import "./style.css"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+import webrtc from "./webrtc";
+
 var server = new WebSocket("wss://blueserver.us.to:26950/");
 //var server = new WebSocket("wss://47.184.193.193:26950/");
 
@@ -234,8 +236,8 @@ function EditTask(props) {
                 document.getElementById("editTask").style.display = "none";
         }}>
             <div style={style} id="form">
-                <div style={{display: "flex", textAlign: "center", margin: "auto"}}>
-                <h5>Schedule a meeting!</h5>     
+                <div style={{ display: "flex", textAlign: "center", margin: "auto" }}>
+                    <h5>Schedule a meeting!</h5>
                 </div>
                 <br />
                 <Form >
@@ -277,7 +279,7 @@ function EditTask(props) {
                         <Form.Group style={{ marginLeft: "2%" }}>
                             <Form.Label style={{ color: "transparent" }}> uwu </Form.Label>
                             <br />
-                            <Button onClick={editServerTask} variant="warning" >Update changes</Button>                          
+                            <Button onClick={editServerTask} variant="warning" >Update changes</Button>
                         </Form.Group>
                         <Form.Group style={{ marginLeft: "2%" }}>
                             <Form.Label style={{ color: "transparent" }}> uwu </Form.Label>
@@ -416,7 +418,7 @@ function Week(props) {
     })
 
     return (
-        <div className="week">
+        <div className="week" id="week">
             <div className="overlayTop" />
             <Header date={props.date} />
             <div className="schedule" onMouseDown={swipe} id="schedule">
@@ -465,7 +467,75 @@ function Week(props) {
     );
 }
 
+var tracks = [];
+
+function Meeting(props) {
+
+    const [updater, setUpdate] = useState(tracks.length);
+
+    const style = {
+        position: "absolute",
+        zIndex: 10000,
+        width: "80%",
+        height: "80%",
+        margin: "0 10% 0 10%",
+    }
+
+    var interval = null;
+
+    useEffect(() => {
+
+        interval = setInterval(() => {
+            if (tracks.length != updater) {
+                reset();
+            }
+        }, 1000);
+    }, [updater]);
+
+    function reset() {
+        clearInterval(interval);
+        interval = null;
+        console.log(updater);
+        setUpdate(tracks.length);
+    }
+
+    return <div style={style} className="hidden" id="video"> </div>;
+}
+
+var name = "";
+function Login(props) {
+
+    var ui = {
+        position: 'absolute',
+        top: '4%',
+        right: "4%",
+        border: "2px solid transparent",
+        'borderRadius': "25px",
+        'zIndex': 5
+    }
+
+    return (<div style={ui}>
+        <div id="init">
+            <InputGroup className="mb-3">
+                <FormControl id="name"
+                    placeholder="Username"
+                    onChange={(e) => {
+                        name = e.target.value;
+                    }}
+                    aria-label="Username"
+                    aria-describedby="basic-addon2"
+                />
+                <InputGroup.Append>
+                    <Button onClick={attemptConnection} id="conn" variant="outline-secondary">Connect!</Button>
+                </InputGroup.Append>
+            </InputGroup>
+        </div>
+    </div>);
+}
+
 function UI(props) {
+
+    const [meeting, setMeeting] = useState(false);
 
     var container = {
         "width": "95vw",
@@ -473,15 +543,48 @@ function UI(props) {
         "height": "100vh",
         "paddingTop": "5vh",
         "margin": "auto",
-        "overflow": "hidden"
+        "overflow": "hidden",
+        "position": "relative"
     }
 
+    var style = {
+        display: "flex",
+        margin: "auto",
+        textAlign: "center",
+        width: "min-content"
+    }
+
+    function switchT(e) {
+        if (meeting) {
+            document.getElementById("schedtitle").className = "title selected";
+            document.getElementById("meettitle").className = "title";
+            document.getElementById("week").className = "slideInLeft week";
+            document.getElementById("video").className = "slideOutLeft hidden";
+            setMeeting(false);
+        }
+    }
+
+    function switchT2(e) {
+        if (!meeting) {
+            document.getElementById("schedtitle").className = "title";
+            document.getElementById("meettitle").className = "title selected";
+            document.getElementById("video").style.opacity = 1;
+            document.getElementById("week").className = "slideOutRight week";
+            document.getElementById("video").className = "slideInRight";
+            setMeeting(true);
+        }
+    }
+
+
     return (<div style={container}>
-        <div>
-            <h1>Schedule</h1>
+        <div style={style}>
+            <h1 onClick={switchT} id="schedtitle" className="title selected">Schedule</h1>
+            <h1 onClick={switchT2} id="meettitle" className="title">Meeting</h1>
         </div>
         <CreateTask />
         <EditTask />
+        <Meeting />
+        <Login />
         <Week date={date} />
     </div>)
 }
@@ -556,23 +659,6 @@ setInterval(() => {
 
 }, 100);
 
-function moveCurrentTime(totalDist) {
-
-    var current = parseInt(document.getElementById("currentTime").style.top.substr(0, document.getElementById("currentTime").style.top.length - 2));
-
-    if (!current) {
-        document.getElementById("currentTime").style.top = "0px";
-    }
-
-    var distance = totalDist - current;
-
-    if (distance <= 1) {
-        document.getElementById("currentTime").style.top = totalDist + "px";
-        return;
-    }
-    document.getElementById("currentTime").style.top = current + (distance / 40) + "px";
-}
-
 setTimeout(() => {
     var myElement = document.getElementById('scroll');
     var topPos = myElement.offsetTop - timeHeight;
@@ -588,3 +674,55 @@ setTimeout(() => {
     document.getElementById("currentTime").classList.add("currentTimeAnim");
 
 }, 1000);
+
+
+function attemptConnection(e) {
+    connect(name);
+}
+
+var conn;
+
+function connect(_name) {
+    console.log("Connecting");
+    conn = new webrtc(_name);
+    document.getElementById("name").disabled = true;
+    document.getElementById("conn").disabled = true;
+
+    conn.onConnect = function () {
+        console.log("Connected!");
+        //logEvent("Connected to Server!");
+        document.getElementById("init").style.display = 'none';
+        var track = document.createElement('video');
+        track.srcObject = conn.media;
+        track.autoplay = true;
+        track.muted = true;
+        document.getElementById("video").appendChild(track);
+
+    }
+
+    conn.onMessage = function (data) {
+        //addText(data.user, data.message);
+    }
+
+    conn.onConn = function (data) {
+        console.log("Created Player");
+        //console.log(document.getElementById("canvas"));
+        //document.getElementById("canvas").innerHTML += players[data];
+    }
+    conn.log = function (data) {
+        //logEvent(data);
+    }
+
+    conn.onDis = function (data) {
+        //update = true;
+    }
+
+    conn.onNewTrack = function (data) {
+        console.log(data);
+        var track = document.createElement('video');
+        track.srcObject = data;
+        track.autoplay = true;
+        tracks.push(track);
+        document.getElementById("video").appendChild(track);
+    }
+}

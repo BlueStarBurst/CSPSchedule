@@ -60,6 +60,350 @@ function _objectWithoutPropertiesLoose(source, excluded) {
 
 /***/ }),
 
+/***/ "./client/webrtc.js":
+/*!**************************!*\
+  !*** ./client/webrtc.js ***!
+  \**************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (/* binding */ webrtc)
+/* harmony export */ });
+class webrtc {
+  constructor(_name) {
+    this.STUN = {
+      urls: 'stun:stun.l.google.com:19302'
+    };
+    this.mediaConstraints = {
+      audio: true,
+      // We want an audio track
+      video: true // ...and we want a video track
+
+    };
+    this.config = {
+      iceServers: [this.STUN]
+    };
+    this.user = _name;
+    this.peers = {};
+    this.channels = {};
+    this.tracks = {};
+    this.serverConnection;
+    this.server();
+  }
+
+  async server() {
+    this.serverConnection = await this.connect();
+
+    this.serverConnection.onmessage = message => {
+      const data = JSON.parse(message.data);
+
+      switch (data.type) {
+        case "connect":
+          break;
+
+        case "login":
+          this.onConnect();
+          this.users(data);
+          break;
+
+        case "updateUsers":
+          this.updateUsers(data);
+          break;
+
+        case "offer":
+          this.onOffer(data);
+          break;
+
+        case "answer":
+          this.onAnswer(data);
+          break;
+
+        case "candidate":
+          this.onCandidate(data);
+          break;
+
+        case "error":
+          this.onError(data);
+          break;
+
+        case "leave":
+          //this.onLeave(data);
+          this.attemptDis(data.user.userName);
+          break;
+
+        default:
+          break;
+      }
+    };
+
+    this.send({
+      type: "login",
+      name: this.user
+    });
+  }
+
+  async onLeave(data) {
+    delete this.peers[data];
+    delete this.channels[data];
+  }
+
+  async connect() {
+    this.media = await navigator.mediaDevices.getUserMedia({
+      video: true,
+      audio: true
+    });
+    return new Promise(function (resolve, reject) {
+      var server = new WebSocket("wss://blueserver.us.to:26950/");
+
+      server.onopen = function () {
+        resolve(server);
+      };
+
+      server.onerror = function (err) {
+        reject(err);
+      };
+    });
+  }
+
+  async offerToAll() {
+    Object.keys(this.peers).forEach(async element => {
+      const offer = await this.peers[element].createOffer();
+      await this.peers[element].setLocalDescription(offer);
+      this.send({
+        type: "offer",
+        offer: offer,
+        name: element
+      });
+    });
+  }
+
+  async onAnswer({
+    answer,
+    sender
+  }) {
+    if (this.peers[sender].connectionState == "stable") return;
+    console.log(`Got an answer from ${sender}`);
+    this.log("Got an answer from " + sender);
+    this.peers[sender].setRemoteDescription(new RTCSessionDescription(answer));
+    console.log(this.channels);
+    console.log(this.peers);
+  }
+
+  async onOffer({
+    offer,
+    name
+  }) {
+    if (this.peers[name].connectionState == "stable") return;
+    console.log(`Got an offer from ${name}`);
+    this.log(`Got an offer from ${name}`);
+    this.peers[name].setRemoteDescription(new RTCSessionDescription(offer));
+    const answer = await this.peers[name].createAnswer();
+    await this.peers[name].setLocalDescription(answer);
+    this.send({
+      type: "answer",
+      answer: this.peers[name].localDescription,
+      name,
+      sender: this.user
+    });
+    console.log(this.peers);
+  }
+
+  async onCandidate(data) {
+    //console.log(data);
+    this.peers[data.sender].addIceCandidate(data.candidate);
+  }
+
+  users(data) {
+    if (!data.success) {
+      return;
+    }
+
+    data.users.forEach(element => {
+      if (!this.peers[element.userName]) {
+        this.createPeer(element.userName);
+      }
+    });
+    this.offerToAll();
+  }
+
+  updateUsers(data) {
+    if (!this.peers[data.user.userName]) {
+      this.createPeer(data.user.userName);
+    }
+  }
+
+  async createPeer(_name) {
+    var peerConnection = new RTCPeerConnection(this.config);
+
+    peerConnection.onicecandidate = ({
+      candidate
+    }) => {
+      if (candidate) {
+        this.send({
+          name: _name,
+          sender: this.user,
+          type: "candidate",
+          candidate
+        });
+      }
+    };
+
+    this.channels[_name] = peerConnection.createDataChannel("data");
+
+    for (const track of this.media.getTracks()) {
+      peerConnection.addTrack(track, this.media);
+    }
+
+    let inboundStream = null;
+
+    peerConnection.ontrack = ev => {
+      console.log("Tracks have been recieved!");
+
+      if (ev.streams && ev.streams[0]) {
+        this.tracks[_name] = ev.streams[0];
+      } else {
+        if (!inboundStream) {
+          inboundStream = new MediaStream(); //videoElem.srcObject = inboundStream;
+          //this.onNewTrack(inboundStream);
+        }
+
+        inboundStream.addTrack(ev.track);
+        this.tracks[_name] = inboundStream;
+      } //console.log(this.tracks[_name]);
+
+    };
+
+    const self = this;
+
+    peerConnection.ondatachannel = function (ev) {
+      console.log('Data channel is created!');
+      self.log("Created data channel for user: " + _name);
+
+      ev.channel.onopen = function () {
+        console.log('Data channel is open and ready to be used.');
+      };
+
+      ev.channel.onmessage = function (event) {
+        var data = JSON.parse(event.data); //console.log(data);
+
+        switch (data.type) {
+          case "message":
+            self.onMessage(data);
+
+          case "player":
+            self.onPlayerUpdate(data);
+
+          default:
+            break;
+        }
+      };
+    };
+
+    peerConnection.onconnectionstatechange = function (event) {
+      switch (peerConnection.connectionState) {
+        case "connected":
+          console.log(`The connection with ${_name} was successful!`);
+          self.onNewTrack(self.tracks[_name]); //self.log(`The connection with ${_name} was successful!`);
+
+          self.onConn(_name);
+          break;
+
+        case "connecting":
+          //setTimeout(self.reconnect(_name), 10000 );
+          break;
+
+        case "disconnected":
+        case "failed":
+          console.log(`The connection with ${_name} failed or disconnected`);
+          peerConnection.restartIce(); //self.reOffer(_name);
+
+          break;
+
+        case "closed":
+          console.log(`The connection with ${_name} was closed`);
+          break;
+      }
+    };
+    /*
+    peerConnection.onnegotiationneeded = async ev => {
+        //peerConnection = await self.createPeer(_name);
+        const offer = await peerConnection.createOffer();
+        await peerConnection.setLocalDescription(offer);
+        self.send({ type: "offer", offer: offer, name: _name });
+    };*/
+
+
+    this.peers[_name] = peerConnection;
+    return true;
+  }
+
+  reconnect(_name) {
+    console.log("reconnecting...");
+
+    if (this.peers[_name].connectionState == "connecting") {
+      this.peers[_name].restartIce();
+    }
+  }
+
+  async reOffer(_name) {
+    if (this.peers[_name].localDescription.type == "offer") {
+      return;
+    }
+
+    await this.createPeer(_name);
+    const offer = await this.peers[_name].createOffer();
+    await this.peers[_name].setLocalDescription(offer);
+    this.send({
+      type: "offer",
+      offer: offer,
+      name: _name
+    });
+  }
+
+  attemptDis(_name) {
+    this.onDis(_name);
+    this.onLeave(_name);
+  }
+
+  send(data) {
+    this.serverConnection.send(JSON.stringify(data));
+  }
+
+  onError({
+    message
+  }) {
+    console.log(message);
+  }
+
+  sendToAll(type, message) {
+    Object.keys(this.channels).forEach(key => {
+      if (this.channels[key].readyState == 'open') {
+        this.channels[key].send(JSON.stringify({
+          type: type,
+          user: this.user,
+          message: message
+        }));
+      }
+    });
+  } // redefinable functions!
+
+
+  onConnect() {}
+
+  onMessage() {}
+
+  log() {}
+
+  onDis() {}
+
+  onNewTrack() {}
+
+}
+
+/***/ }),
+
 /***/ "./node_modules/classnames/index.js":
 /*!******************************************!*\
   !*** ./node_modules/classnames/index.js ***!
@@ -141,7 +485,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd;;;AAGA;EACE,uBAAuB;EACvB,cAAc;EACd;AACF;;AAEA;EACE,yBAAyB;EACzB,sBAAsB;EACtB,qBAAqB;EACrB,iBAAiB;AACnB;;AAEA;EACE,iBAAiB;EACjB,wBAAwB;EACxB,oBAAoB;EACpB,2BAA2B;EAC3B,yBAAyB;AAC3B;;AAEA;EACE,uBAAuB;EACvB,cAAc;AAChB;AACA;EACE,uBAAuB;EACvB,cAAc;AAChB;;;;AAIA;EACE,YAAY;EACZ,UAAU;EACV,kBAAkB;AACpB;;;;AAIA;EACE,mBAAmB;EACnB,SAAS;EACT,UAAU;EACV,yBAAyB;EACzB,yBAAyB;EACzB,iBAAiB;EACjB,MAAM;EACN,WAAW;AACb;;AAEA;EACE,wCAAwC;EACxC,YAAY;EACZ,qBAAqB;EACrB,oBAAoB;AACtB;;AAEA;EACE,iBAAiB;EACjB,SAAS;EACT,UAAU;AACZ;;AAEA;EACE,YAAY;EACZ,kBAAkB;EAClB,SAAS;EACT,YAAY;EACZ,gBAAgB;EAChB,qBAAqB;AACvB;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,4CAA4C;EAC5C,WAAW;AACb;;AAEA;EACE,SAAS;EACT,UAAU;EACV,kBAAkB;AACpB;;AAEA;EACE,QAAQ;EACR,kBAAkB;EAClB,WAAW;EACX,aAAa;EACb,2HAA2H;EAC3H,mBAAmB;AACrB;;AAEA;EACE,SAAS;EACT,mBAAmB;AACrB;;AAEA;EACE,kBAAkB;EAClB,yBAAyB;EACzB,oCAAoC;EACpC,UAAU;AACZ;;AAEA;EACE,8BAA8B;EAC9B,6BAA6B;AAC/B;;AAEA;EACE,aAAa;EACb,MAAM;EACN,SAAS;EACT,UAAU;EACV,kBAAkB;AACpB;;AAEA;EACE,kBAAkB;EAClB,WAAW;EACX,WAAW;EACX,sCAAsC;EACtC,UAAU;AACZ;;AAEA;EACE,gCAAgC;AAClC;;AAEA;EACE,KAAK,6BAA6B,EAAE,UAAU,CAAC;EAC/C,OAAO,yBAAyB,EAAE,UAAU,EAAE;AAChD;;AAEA;EACE,KAAK,2BAA2B,EAAE,UAAU,EAAE;EAC9C,OAAO,yBAAyB,EAAE;AACpC;;AAEA;EACE,KAAK,yBAAyB,EAAE,UAAU,EAAE;EAC5C,OAAO,2BAA2B,EAAE,UAAU,CAAC;AACjD;;AAEA;EACE,oBAAoB;EACpB,UAAU;EACV,mBAAmB;EACnB,UAAU;EACV,YAAY;EACZ,cAAc;EACd,kBAAkB;EAClB,iBAAiB;AACnB;;AAEA;EACE,6BAA6B;AAC/B;;AAEA;EACE,YAAY;EACZ,mBAAmB;EACnB,UAAU;EACV,YAAY;EACZ,cAAc;EACd,kBAAkB;EAClB,iBAAiB;AACnB;;AAEA;EACE,eAAe;EACf,UAAU;AACZ;;AAEA;EACE,kBAAkB;EAClB,QAAQ;EACR,WAAW;EACX,WAAW;EACX,yCAAyC;AAC3C","sourcesContent":["::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\nvideo {\r\n  z-index: 100000000000000000000;\r\n  min-width: 30%;\r\n  max-width: 100%;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"AAAA;EACE,YAAY;AACd;;;AAGA;EACE,uBAAuB;EACvB,cAAc;EACd;AACF;;AAEA;EACE,yBAAyB;EACzB,sBAAsB;EACtB,qBAAqB;EACrB,iBAAiB;AACnB;;AAEA;EACE,iBAAiB;EACjB,wBAAwB;EACxB,oBAAoB;EACpB,2BAA2B;EAC3B,yBAAyB;AAC3B;;AAEA;EACE,uBAAuB;EACvB,cAAc;AAChB;AACA;EACE,uBAAuB;EACvB,cAAc;AAChB;;;;AAIA;EACE,YAAY;EACZ,UAAU;EACV,kBAAkB;AACpB;;;;AAIA;EACE,mBAAmB;EACnB,SAAS;EACT,UAAU;EACV,yBAAyB;EACzB,yBAAyB;EACzB,iBAAiB;EACjB,MAAM;EACN,WAAW;AACb;;AAEA;EACE,wCAAwC;EACxC,YAAY;EACZ,qBAAqB;EACrB,oBAAoB;AACtB;;AAEA;EACE,iBAAiB;EACjB,SAAS;EACT,UAAU;AACZ;;AAEA;EACE,YAAY;EACZ,kBAAkB;EAClB,SAAS;EACT,YAAY;EACZ,gBAAgB;EAChB,qBAAqB;AACvB;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,aAAa;AACf;;AAEA;EACE,4CAA4C;EAC5C,WAAW;AACb;;AAEA;EACE,SAAS;EACT,UAAU;EACV,kBAAkB;AACpB;;AAEA;EACE,QAAQ;EACR,kBAAkB;EAClB,WAAW;EACX,aAAa;EACb,2HAA2H;EAC3H,mBAAmB;AACrB;;AAEA;EACE,SAAS;EACT,mBAAmB;AACrB;;AAEA;EACE,kBAAkB;EAClB,yBAAyB;EACzB,oCAAoC;EACpC,UAAU;AACZ;;AAEA;EACE,8BAA8B;EAC9B,6BAA6B;AAC/B;;AAEA;EACE,aAAa;EACb,MAAM;EACN,SAAS;EACT,UAAU;EACV,kBAAkB;AACpB;;AAEA;EACE,kBAAkB;EAClB,WAAW;EACX,WAAW;EACX,sCAAsC;EACtC,UAAU;AACZ;;AAEA;EACE,gCAAgC;AAClC;;AAEA;EACE,KAAK,6BAA6B,EAAE,UAAU,CAAC;EAC/C,OAAO,yBAAyB,EAAE,UAAU,EAAE;AAChD;;AAEA;EACE,KAAK,2BAA2B,EAAE,UAAU,EAAE;EAC9C,OAAO,yBAAyB,EAAE;AACpC;;AAEA;EACE,KAAK,yBAAyB,EAAE,UAAU,EAAE;EAC5C,OAAO,2BAA2B,EAAE,UAAU,CAAC;AACjD;;AAEA;EACE,oBAAoB;EACpB,UAAU;EACV,mBAAmB;EACnB,UAAU;EACV,YAAY;EACZ,cAAc;EACd,kBAAkB;EAClB,iBAAiB;AACnB;;AAEA;EACE,6BAA6B;AAC/B;;AAEA;EACE,YAAY;EACZ,mBAAmB;EACnB,UAAU;EACV,YAAY;EACZ,cAAc;EACd,kBAAkB;EAClB,iBAAiB;AACnB;;AAEA;EACE,eAAe;EACf,UAAU;AACZ;;AAEA;EACE,kBAAkB;EAClB,QAAQ;EACR,WAAW;EACX,WAAW;EACX,yCAAyC;AAC3C;;AAEA;EACE,8BAA8B;EAC9B,cAAc;EACd,eAAe;AACjB;;AAEA;EACE,mBAAmB;AACrB;;AAEA;EACE,0BAA0B;AAC5B;;AAEA;EACE,eAAe;AACjB;;AAEA;EACE,2BAA2B;EAC3B,6BAA6B;EAC7B,UAAU;AACZ;;AAEA;EACE,0BAA0B;EAC1B,4BAA4B;EAC5B,UAAU;AACZ;;AAEA;EACE,0BAA0B;EAC1B,UAAU;AACZ;;AAEA;EACE,yBAAyB;EACzB,UAAU;AACZ;;AAEA;EACE;IACE,yBAAyB;IACzB,UAAU;EACZ;EACA;IACE,6BAA6B;IAC7B,UAAU;EACZ;AACF;;AAEA;EACE;IACE,yBAAyB;IACzB,UAAU;EACZ;EACA;IACE,4BAA4B;IAC5B,UAAU;EACZ;AACF;;AAEA;EACE;IACE,4BAA4B;IAC5B,UAAU;EACZ;EACA;IACE,yBAAyB;IACzB,UAAU;EACZ;AACF;;AAEA;EACE;IACE,6BAA6B;IAC7B,UAAU;EACZ;EACA;IACE,yBAAyB;IACzB,UAAU;EACZ;AACF;;AAEA;EACE,UAAU;AACZ","sourcesContent":["::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\nvideo {\r\n  z-index: 100000000000000000000;\r\n  min-width: 30%;\r\n  max-width: 100%;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -2270,6 +2614,86 @@ function (_ref, ref) {
 });
 FormText.displayName = 'FormText';
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (FormText);
+
+/***/ }),
+
+/***/ "./node_modules/react-bootstrap/esm/InputGroup.js":
+/*!********************************************************!*\
+  !*** ./node_modules/react-bootstrap/esm/InputGroup.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var _babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/helpers/esm/objectWithoutPropertiesLoose */ "./node_modules/@babel/runtime/helpers/esm/objectWithoutPropertiesLoose.js");
+/* harmony import */ var _babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @babel/runtime/helpers/esm/extends */ "./node_modules/@babel/runtime/helpers/esm/extends.js");
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! classnames */ "./node_modules/classnames/index.js");
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
+/* harmony import */ var _createWithBsPrefix__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./createWithBsPrefix */ "./node_modules/react-bootstrap/esm/createWithBsPrefix.js");
+/* harmony import */ var _ThemeProvider__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./ThemeProvider */ "./node_modules/react-bootstrap/esm/ThemeProvider.js");
+
+
+
+
+
+
+var InputGroupAppend = (0,_createWithBsPrefix__WEBPACK_IMPORTED_MODULE_4__.default)('input-group-append');
+var InputGroupPrepend = (0,_createWithBsPrefix__WEBPACK_IMPORTED_MODULE_4__.default)('input-group-prepend');
+var InputGroupText = (0,_createWithBsPrefix__WEBPACK_IMPORTED_MODULE_4__.default)('input-group-text', {
+  Component: 'span'
+});
+
+var InputGroupCheckbox = function InputGroupCheckbox(props) {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_3__.createElement(InputGroupText, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_3__.createElement("input", (0,_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({
+    type: "checkbox"
+  }, props)));
+};
+
+var InputGroupRadio = function InputGroupRadio(props) {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_3__.createElement(InputGroupText, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_3__.createElement("input", (0,_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({
+    type: "radio"
+  }, props)));
+};
+
+/**
+ *
+ * @property {InputGroupAppend} Append
+ * @property {InputGroupPrepend} Prepend
+ * @property {InputGroupText} Text
+ * @property {InputGroupRadio} Radio
+ * @property {InputGroupCheckbox} Checkbox
+ */
+var InputGroup = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_3__.forwardRef(function (_ref, ref) {
+  var bsPrefix = _ref.bsPrefix,
+      size = _ref.size,
+      hasValidation = _ref.hasValidation,
+      className = _ref.className,
+      _ref$as = _ref.as,
+      Component = _ref$as === void 0 ? 'div' : _ref$as,
+      props = (0,_babel_runtime_helpers_esm_objectWithoutPropertiesLoose__WEBPACK_IMPORTED_MODULE_0__.default)(_ref, ["bsPrefix", "size", "hasValidation", "className", "as"]);
+
+  bsPrefix = (0,_ThemeProvider__WEBPACK_IMPORTED_MODULE_5__.useBootstrapPrefix)(bsPrefix, 'input-group');
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_3__.createElement(Component, (0,_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({
+    ref: ref
+  }, props, {
+    className: classnames__WEBPACK_IMPORTED_MODULE_2___default()(className, bsPrefix, size && bsPrefix + "-" + size, hasValidation && 'has-validation')
+  }));
+});
+InputGroup.displayName = 'InputGroup';
+
+var InputGroupWithExtras = (0,_babel_runtime_helpers_esm_extends__WEBPACK_IMPORTED_MODULE_1__.default)({}, InputGroup, {
+  Text: InputGroupText,
+  Radio: InputGroupRadio,
+  Checkbox: InputGroupCheckbox,
+  Append: InputGroupAppend,
+  Prepend: InputGroupPrepend
+});
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (InputGroupWithExtras);
 
 /***/ }),
 
@@ -33237,11 +33661,15 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-bootstrap/Table */ "./node_modules/react-bootstrap/esm/Table.js");
-/* harmony import */ var react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-bootstrap/Button */ "./node_modules/react-bootstrap/esm/Button.js");
-/* harmony import */ var react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! react-bootstrap/Form */ "./node_modules/react-bootstrap/esm/Form.js");
+/* harmony import */ var react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-bootstrap/Table */ "./node_modules/react-bootstrap/esm/Table.js");
+/* harmony import */ var react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-bootstrap/InputGroup */ "./node_modules/react-bootstrap/esm/InputGroup.js");
+/* harmony import */ var react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-bootstrap/FormControl */ "./node_modules/react-bootstrap/esm/FormControl.js");
+/* harmony import */ var react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-bootstrap/Button */ "./node_modules/react-bootstrap/esm/Button.js");
+/* harmony import */ var react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-bootstrap/Form */ "./node_modules/react-bootstrap/esm/Form.js");
 /* harmony import */ var _style_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./style.css */ "./client/style.css");
 /* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! bootstrap/dist/css/bootstrap.min.css */ "./node_modules/bootstrap/dist/css/bootstrap.min.css");
+/* harmony import */ var _webrtc__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./webrtc */ "./client/webrtc.js");
+
 
 
 
@@ -33351,31 +33779,31 @@ function CreateTask(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: style,
     id: "form"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default, {
     onSubmit: createServerTask
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     type: "text",
     id: "createSubject",
     placeholder: "Class"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     type: "textarea",
     id: "createTitle",
     placeholder: "Brief Overview"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     type: "date",
     id: "createDate"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     type: "time",
     id: "createTime"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     as: "select",
     id: "createLength"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
@@ -33394,15 +33822,15 @@ function CreateTask(props) {
     value: "105"
   }, "01:45"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
     value: "120"
-  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, {
+  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, {
     style: {
       color: "transparent"
     }
-  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_5__.default, {
+  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__.default, {
     type: "submit"
   }, "Submit form"))))));
 }
@@ -33478,29 +33906,29 @@ function EditTask(props) {
       textAlign: "center",
       margin: "auto"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     type: "text",
     id: "editSubject",
     placeholder: "Class"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     type: "textarea",
     id: "editTitle",
     placeholder: "Brief Overview"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     type: "date",
     id: "editDate"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     type: "time",
     id: "editTime"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
     as: "select",
     id: "editLength"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
@@ -33519,26 +33947,26 @@ function EditTask(props) {
     value: "105"
   }, "01:45"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
     value: "120"
-  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, {
+  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, {
     style: {
       color: "transparent"
     }
-  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_5__.default, {
+  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__.default, {
     onClick: editServerTask,
     variant: "warning"
-  }, "Update changes")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Group, {
+  }, "Update changes")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_4__.default.Label, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, {
     style: {
       color: "transparent"
     }
-  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_5__.default, {
+  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__.default, {
     onClick: removeServerTask,
     variant: "danger"
   }, "Remove meeting"))))));
@@ -33623,7 +34051,7 @@ function Hour(props) {
 }
 
 function Header(props) {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_6__.default, {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_7__.default, {
     borderless: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", {
     className: "headers"
@@ -33659,7 +34087,8 @@ function Week(props) {
     }, 1000);
   });
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
-    className: "week"
+    className: "week",
+    id: "week"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "overlayTop"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Header, {
@@ -33671,7 +34100,7 @@ function Week(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     id: "currentTime",
     className: "currentTime"
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_6__.default, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_7__.default, {
     bordered: true,
     hover: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("tbody", null, Array.from({
@@ -33725,18 +34154,124 @@ function Week(props) {
   })))));
 }
 
+var tracks = [];
+
+function Meeting(props) {
+  const [updater, setUpdate] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(tracks.length);
+  const style = {
+    position: "absolute",
+    zIndex: 10000,
+    width: "80%",
+    height: "80%",
+    margin: "0 10% 0 10%"
+  };
+  var interval = null;
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    interval = setInterval(() => {
+      if (tracks.length != updater) {
+        reset();
+      }
+    }, 1000);
+  }, [updater]);
+
+  function reset() {
+    clearInterval(interval);
+    interval = null;
+    console.log(updater);
+    setUpdate(tracks.length);
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    style: style,
+    className: "hidden",
+    id: "video"
+  }, " ");
+}
+
+var name = "";
+
+function Login(props) {
+  var ui = {
+    position: 'absolute',
+    top: '4%',
+    right: "4%",
+    border: "2px solid transparent",
+    'borderRadius': "25px",
+    'zIndex': 5
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    style: ui
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    id: "init"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_8__.default, {
+    className: "mb-3"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_9__.default, {
+    id: "name",
+    placeholder: "Username",
+    onChange: e => {
+      name = e.target.value;
+    },
+    "aria-label": "Username",
+    "aria-describedby": "basic-addon2"
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_8__.default.Append, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__.default, {
+    onClick: attemptConnection,
+    id: "conn",
+    variant: "outline-secondary"
+  }, "Connect!")))));
+}
+
 function UI(props) {
+  const [meeting, setMeeting] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
   var container = {
     "width": "95vw",
     "minWidth": "1000px",
     "height": "100vh",
     "paddingTop": "5vh",
     "margin": "auto",
-    "overflow": "hidden"
+    "overflow": "hidden",
+    "position": "relative"
   };
+  var style = {
+    display: "flex",
+    margin: "auto",
+    textAlign: "center",
+    width: "min-content"
+  };
+
+  function switchT(e) {
+    if (meeting) {
+      document.getElementById("schedtitle").className = "title selected";
+      document.getElementById("meettitle").className = "title";
+      document.getElementById("week").className = "slideInLeft week";
+      document.getElementById("video").className = "slideOutLeft hidden";
+      setMeeting(false);
+    }
+  }
+
+  function switchT2(e) {
+    if (!meeting) {
+      document.getElementById("schedtitle").className = "title";
+      document.getElementById("meettitle").className = "title selected";
+      document.getElementById("video").style.opacity = 1;
+      document.getElementById("week").className = "slideOutRight week";
+      document.getElementById("video").className = "slideInRight";
+      setMeeting(true);
+    }
+  }
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: container
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h1", null, "Schedule")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(CreateTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(EditTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Week, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    style: style
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h1", {
+    onClick: switchT,
+    id: "schedtitle",
+    className: "title selected"
+  }, "Schedule"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h1", {
+    onClick: switchT2,
+    id: "meettitle",
+    className: "title"
+  }, "Meeting")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(CreateTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(EditTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Meeting, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Login, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Week, {
     date: date
   }));
 }
@@ -33803,24 +34338,6 @@ setInterval(() => {
 
   document.getElementById("currentTime").style.top = totalDist + "px";
 }, 100);
-
-function moveCurrentTime(totalDist) {
-  var current = parseInt(document.getElementById("currentTime").style.top.substr(0, document.getElementById("currentTime").style.top.length - 2));
-
-  if (!current) {
-    document.getElementById("currentTime").style.top = "0px";
-  }
-
-  var distance = totalDist - current;
-
-  if (distance <= 1) {
-    document.getElementById("currentTime").style.top = totalDist + "px";
-    return;
-  }
-
-  document.getElementById("currentTime").style.top = current + distance / 40 + "px";
-}
-
 setTimeout(() => {
   var myElement = document.getElementById('scroll');
   var topPos = myElement.offsetTop - timeHeight;
@@ -33832,6 +34349,53 @@ setTimeout(() => {
   document.getElementById("currentTime").style.opacity = "1";
   document.getElementById("currentTime").classList.add("currentTimeAnim");
 }, 1000);
+
+function attemptConnection(e) {
+  connect(name);
+}
+
+var conn;
+
+function connect(_name) {
+  console.log("Connecting");
+  conn = new _webrtc__WEBPACK_IMPORTED_MODULE_4__.default(_name);
+  document.getElementById("name").disabled = true;
+  document.getElementById("conn").disabled = true;
+
+  conn.onConnect = function () {
+    console.log("Connected!"); //logEvent("Connected to Server!");
+
+    document.getElementById("init").style.display = 'none';
+    var track = document.createElement('video');
+    track.srcObject = conn.media;
+    track.autoplay = true;
+    track.muted = true;
+    document.getElementById("video").appendChild(track);
+  };
+
+  conn.onMessage = function (data) {//addText(data.user, data.message);
+  };
+
+  conn.onConn = function (data) {
+    console.log("Created Player"); //console.log(document.getElementById("canvas"));
+    //document.getElementById("canvas").innerHTML += players[data];
+  };
+
+  conn.log = function (data) {//logEvent(data);
+  };
+
+  conn.onDis = function (data) {//update = true;
+  };
+
+  conn.onNewTrack = function (data) {
+    console.log(data);
+    var track = document.createElement('video');
+    track.srcObject = data;
+    track.autoplay = true;
+    tracks.push(track);
+    document.getElementById("video").appendChild(track);
+  };
+}
 })();
 
 /******/ })()
