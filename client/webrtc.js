@@ -74,7 +74,14 @@ export default class webrtc {
 
     async connect() {
         this.media = await navigator.mediaDevices.getUserMedia(
-            { video: true, audio: true });
+            {
+                video: {
+                    width: { ideal: 1080 },
+                    height: { ideal: 720 }
+                }, audio: true
+            }).catch((er) => {
+                console.log("nope!");
+            });
         return new Promise(function (resolve, reject) {
             var server = new WebSocket("wss://blueserver.us.to:26950/");
             server.onopen = function () {
@@ -171,7 +178,7 @@ export default class webrtc {
             console.log("Tracks have been recieved!");
             if (ev.streams && ev.streams[0]) {
                 this.tracks[_name] = ev.streams[0];
-                
+
             } else {
                 if (!inboundStream) {
                     inboundStream = new MediaStream();
@@ -181,11 +188,11 @@ export default class webrtc {
                 inboundStream.addTrack(ev.track);
                 this.tracks[_name] = inboundStream;
             }
-            
+
             //console.log(this.tracks[_name]);
         }
 
-        
+
 
         const self = this;
 
@@ -194,15 +201,26 @@ export default class webrtc {
             self.log("Created data channel for user: " + _name);
             ev.channel.onopen = function () {
                 console.log('Data channel is open and ready to be used.');
+                self.onNewChannel(_name);
             };
             ev.channel.onmessage = function (event) {
                 var data = JSON.parse(event.data);
+                console.log(data);
                 //console.log(data);
                 switch (data.type) {
-                    case "message":
-                        self.onMessage(data);
-                    case "player":
-                        self.onPlayerUpdate(data);
+                    case "joinCall":
+                        //console.log("onjoincall");
+                        self.onJoinCall(data);
+                        break;
+                    case "leaveCall":
+                        self.onLeaveCall(data.user);
+                        break;
+                    case "disabledVideo":
+                        self.onDisabledVideo(data.user);
+                        break;
+                    case "enabledVideo":
+                        self.onEnabledVideo(data.user);
+                        break;
                     default:
                         break;
                 }
@@ -213,7 +231,7 @@ export default class webrtc {
             switch (peerConnection.connectionState) {
                 case "connected":
                     console.log(`The connection with ${_name} was successful!`);
-                    self.onNewTrack(self.tracks[_name]);
+                    //self.onNewTrack(_name, self.tracks[_name]);
                     //self.log(`The connection with ${_name} was successful!`);
                     self.onConn(_name);
                     break;
@@ -222,6 +240,7 @@ export default class webrtc {
                     break;
                 case "disconnected":
                 case "failed":
+                    self.onLeaveCall(_name);
                     console.log(`The connection with ${_name} failed or disconnected`);
                     peerConnection.restartIce();
                     //self.reOffer(_name);
@@ -282,11 +301,23 @@ export default class webrtc {
         })
     }
 
+    sendToUser(type, reciever, message) {
+        console.log("sending to user " + reciever);
+        Object.keys(this.channels).forEach((key) => {
+            console.log(key);
+        });
+
+
+        if (this.channels[reciever].readyState == 'open') {
+            this.channels[reciever].send(JSON.stringify({ type: type, user: this.user, message: message }));
+        }
+    }
+
     // redefinable functions!
 
-    onConnect() {};
-    onMessage() {};
-    log() {};
-    onDis() {};
-    onNewTrack() {};
+    onConnect() { };
+    onMessage() { };
+    log() { };
+    onDis() { };
+    onNewTrack() { };
 }

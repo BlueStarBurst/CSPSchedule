@@ -88,6 +88,10 @@ tr {
   display: none;
 }
 
+.meetingVideos::-webkit-scrollbar {
+  display: none;
+}
+
 .highlighted {
   background-color: rgba(255, 255, 255, 0.048);
   z-index: -1;
@@ -198,12 +202,6 @@ tr {
   border-bottom: 1px rgb(48, 48, 48) dashed;
 }
 
-video {
-  z-index: 100000000000000000000;
-  min-width: 30%;
-  max-width: 100%;
-}
-
 .title {
   margin: 0 10% 10% 0;
 }
@@ -284,4 +282,97 @@ video {
 
 .hidden {
   opacity: 0;
+}
+
+.circleButton {
+  width: 75px;
+  height: 75px;
+  border-radius: 100%;
+  margin: auto;
+  position: relative;
+  display: flex;
+  z-index: 100000000000000000000000000;
+}
+
+.circleButton:hover {
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.join {
+  background-color: rgb(42, 202, 42);
+}
+
+.leave {
+  background-color: red;
+}
+
+.disabled {
+  background-color: red;
+}
+
+.enabled {
+  background-color: rgb(146, 146, 146);
+  opacity: 1;
+}
+
+.circleButton img {
+  width: 60%;
+  margin: auto;
+}
+
+video {
+  position: relative;
+  z-index: 1000;
+  width: 100%;
+  margin: auto;
+  object-fit: cover;
+  object-position: center;
+  flex-shrink: 2;
+  
+}
+
+.videoBox {
+  width: auto;
+  height: auto;
+  flex-shrink: 2;
+  flex-grow: 1;
+  flex-basis: 100px;
+  min-width: 33%;
+  max-width: 60%;
+  margin: auto;
+  background-image: url(img/novideo.png);
+  background-size: contain;
+  background-color: rgba(128, 128, 128, 0.096);
+  
+}
+
+.meetingVideos {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: auto;
+  width: 100%;
+  height: 90%;
+  filter: blur(1000);
+  
+  animation: fadeEffect 3s infinite;
+  border-radius: 25px;
+}
+
+.blur {
+  filter: blur(100);
+}
+
+@keyframes fadeEffect {
+  0% {background-color: transparent;}
+  50% {background-color: rgba(128, 128, 128, 0.021);}
+  100% {background-color: transparent;}
+}
+
+.back {
+  background-image: url(img/back.png);
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
 }

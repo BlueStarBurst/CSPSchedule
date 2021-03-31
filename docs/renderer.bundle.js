@@ -151,8 +151,17 @@ class webrtc {
 
   async connect() {
     this.media = await navigator.mediaDevices.getUserMedia({
-      video: true,
+      video: {
+        width: {
+          ideal: 1080
+        },
+        height: {
+          ideal: 720
+        }
+      },
       audio: true
+    }).catch(er => {
+      console.log("nope!");
     });
     return new Promise(function (resolve, reject) {
       var server = new WebSocket("wss://blueserver.us.to:26950/");
@@ -283,17 +292,30 @@ class webrtc {
 
       ev.channel.onopen = function () {
         console.log('Data channel is open and ready to be used.');
+        self.onNewChannel(_name);
       };
 
       ev.channel.onmessage = function (event) {
-        var data = JSON.parse(event.data); //console.log(data);
+        var data = JSON.parse(event.data);
+        console.log(data); //console.log(data);
 
         switch (data.type) {
-          case "message":
-            self.onMessage(data);
+          case "joinCall":
+            //console.log("onjoincall");
+            self.onJoinCall(data);
+            break;
 
-          case "player":
-            self.onPlayerUpdate(data);
+          case "leaveCall":
+            self.onLeaveCall(data.user);
+            break;
+
+          case "disabledVideo":
+            self.onDisabledVideo(data.user);
+            break;
+
+          case "enabledVideo":
+            self.onEnabledVideo(data.user);
+            break;
 
           default:
             break;
@@ -304,8 +326,8 @@ class webrtc {
     peerConnection.onconnectionstatechange = function (event) {
       switch (peerConnection.connectionState) {
         case "connected":
-          console.log(`The connection with ${_name} was successful!`);
-          self.onNewTrack(self.tracks[_name]); //self.log(`The connection with ${_name} was successful!`);
+          console.log(`The connection with ${_name} was successful!`); //self.onNewTrack(_name, self.tracks[_name]);
+          //self.log(`The connection with ${_name} was successful!`);
 
           self.onConn(_name);
           break;
@@ -316,6 +338,7 @@ class webrtc {
 
         case "disconnected":
         case "failed":
+          self.onLeaveCall(_name);
           console.log(`The connection with ${_name} failed or disconnected`);
           peerConnection.restartIce(); //self.reOffer(_name);
 
@@ -387,6 +410,21 @@ class webrtc {
         }));
       }
     });
+  }
+
+  sendToUser(type, reciever, message) {
+    console.log("sending to user " + reciever);
+    Object.keys(this.channels).forEach(key => {
+      console.log(key);
+    });
+
+    if (this.channels[reciever].readyState == 'open') {
+      this.channels[reciever].send(JSON.stringify({
+        type: type,
+        user: this.user,
+        message: message
+      }));
+    }
   } // redefinable functions!
 
 
@@ -480,12 +518,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/api.js */ "./node_modules/css-loader/dist/runtime/api.js");
 /* harmony import */ var _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../node_modules/css-loader/dist/runtime/getUrl.js */ "./node_modules/css-loader/dist/runtime/getUrl.js");
+/* harmony import */ var _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _img_novideo_png__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./img/novideo.png */ "./client/img/novideo.png");
+/* harmony import */ var _img_back_png__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./img/back.png */ "./client/img/back.png");
 // Imports
 
 
+
+
+
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_1___default()((_node_modules_css_loader_dist_runtime_cssWithMappingToString_js__WEBPACK_IMPORTED_MODULE_0___default()));
+var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(_img_novideo_png__WEBPACK_IMPORTED_MODULE_3__.default);
+var ___CSS_LOADER_URL_REPLACEMENT_1___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(_img_back_png__WEBPACK_IMPORTED_MODULE_4__.default);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\nvideo {\r\n  z-index: 100000000000000000000;\r\n  min-width: 30%;\r\n  max-width: 100%;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"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","sourcesContent":["::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\nvideo {\r\n  z-index: 100000000000000000000;\r\n  min-width: 30%;\r\n  max-width: 100%;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ");\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"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","sourcesContent":["::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(img/novideo.png);\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(img/back.png);\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -637,6 +684,50 @@ module.exports = function cssWithMappingToString(item) {
 
 /***/ }),
 
+/***/ "./node_modules/css-loader/dist/runtime/getUrl.js":
+/*!********************************************************!*\
+  !*** ./node_modules/css-loader/dist/runtime/getUrl.js ***!
+  \********************************************************/
+/***/ ((module) => {
+
+"use strict";
+
+
+module.exports = function (url, options) {
+  if (!options) {
+    // eslint-disable-next-line no-param-reassign
+    options = {};
+  } // eslint-disable-next-line no-underscore-dangle, no-param-reassign
+
+
+  url = url && url.__esModule ? url.default : url;
+
+  if (typeof url !== "string") {
+    return url;
+  } // If url is already wrapped in quotes, remove them
+
+
+  if (/^['"].*['"]$/.test(url)) {
+    // eslint-disable-next-line no-param-reassign
+    url = url.slice(1, -1);
+  }
+
+  if (options.hash) {
+    // eslint-disable-next-line no-param-reassign
+    url += options.hash;
+  } // Should url be wrapped?
+  // See https://drafts.csswg.org/css-values-3/#urls
+
+
+  if (/["'() \t\n]/.test(url) || options.needQuotes) {
+    return "\"".concat(url.replace(/"/g, '\\"').replace(/\n/g, "\\n"), "\"");
+  }
+
+  return url;
+};
+
+/***/ }),
+
 /***/ "./node_modules/dom-helpers/esm/camelize.js":
 /*!**************************************************!*\
   !*** ./node_modules/dom-helpers/esm/camelize.js ***!
@@ -654,6 +745,96 @@ function camelize(string) {
     return chr.toUpperCase();
   });
 }
+
+/***/ }),
+
+/***/ "./client/img/back.png":
+/*!*****************************!*\
+  !*** ./client/img/back.png ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "client/img/back.png");
+
+/***/ }),
+
+/***/ "./client/img/call.png":
+/*!*****************************!*\
+  !*** ./client/img/call.png ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "client/img/call.png");
+
+/***/ }),
+
+/***/ "./client/img/camera.png":
+/*!*******************************!*\
+  !*** ./client/img/camera.png ***!
+  \*******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "client/img/camera.png");
+
+/***/ }),
+
+/***/ "./client/img/end.png":
+/*!****************************!*\
+  !*** ./client/img/end.png ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "client/img/end.png");
+
+/***/ }),
+
+/***/ "./client/img/mic.png":
+/*!****************************!*\
+  !*** ./client/img/mic.png ***!
+  \****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "client/img/mic.png");
+
+/***/ }),
+
+/***/ "./client/img/novideo.png":
+/*!********************************!*\
+  !*** ./client/img/novideo.png ***!
+  \********************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "client/img/novideo.png");
 
 /***/ }),
 
@@ -33634,6 +33815,18 @@ module.exports = warning;
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/global */
+/******/ 	(() => {
+/******/ 		__webpack_require__.g = (function() {
+/******/ 			if (typeof globalThis === 'object') return globalThis;
+/******/ 			try {
+/******/ 				return this || new Function('return this')();
+/******/ 			} catch (e) {
+/******/ 				if (typeof window === 'object') return window;
+/******/ 			}
+/******/ 		})();
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
 /******/ 	(() => {
 /******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
@@ -33650,6 +33843,26 @@ module.exports = warning;
 /******/ 		};
 /******/ 	})();
 /******/ 	
+/******/ 	/* webpack/runtime/publicPath */
+/******/ 	(() => {
+/******/ 		var scriptUrl;
+/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
+/******/ 		var document = __webpack_require__.g.document;
+/******/ 		if (!scriptUrl && document) {
+/******/ 			if (document.currentScript)
+/******/ 				scriptUrl = document.currentScript.src
+/******/ 			if (!scriptUrl) {
+/******/ 				var scripts = document.getElementsByTagName("script");
+/******/ 				if(scripts.length) scriptUrl = scripts[scripts.length - 1].src
+/******/ 			}
+/******/ 		}
+/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
+/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
+/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
+/******/ 		scriptUrl = scriptUrl.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
+/******/ 		__webpack_require__.p = scriptUrl;
+/******/ 	})();
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
@@ -33661,14 +33874,24 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! react-bootstrap/Table */ "./node_modules/react-bootstrap/esm/Table.js");
-/* harmony import */ var react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! react-bootstrap/InputGroup */ "./node_modules/react-bootstrap/esm/InputGroup.js");
-/* harmony import */ var react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! react-bootstrap/FormControl */ "./node_modules/react-bootstrap/esm/FormControl.js");
-/* harmony import */ var react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! react-bootstrap/Button */ "./node_modules/react-bootstrap/esm/Button.js");
-/* harmony import */ var react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! react-bootstrap/Form */ "./node_modules/react-bootstrap/esm/Form.js");
+/* harmony import */ var react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react-bootstrap/Table */ "./node_modules/react-bootstrap/esm/Table.js");
+/* harmony import */ var react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react-bootstrap/InputGroup */ "./node_modules/react-bootstrap/esm/InputGroup.js");
+/* harmony import */ var react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-bootstrap/FormControl */ "./node_modules/react-bootstrap/esm/FormControl.js");
+/* harmony import */ var react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react-bootstrap/Button */ "./node_modules/react-bootstrap/esm/Button.js");
+/* harmony import */ var react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-bootstrap/Form */ "./node_modules/react-bootstrap/esm/Form.js");
 /* harmony import */ var _style_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./style.css */ "./client/style.css");
 /* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! bootstrap/dist/css/bootstrap.min.css */ "./node_modules/bootstrap/dist/css/bootstrap.min.css");
-/* harmony import */ var _webrtc__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./webrtc */ "./client/webrtc.js");
+/* harmony import */ var _img_camera_png__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./img/camera.png */ "./client/img/camera.png");
+/* harmony import */ var _img_mic_png__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./img/mic.png */ "./client/img/mic.png");
+/* harmony import */ var _img_call_png__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./img/call.png */ "./client/img/call.png");
+/* harmony import */ var _img_end_png__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./img/end.png */ "./client/img/end.png");
+/* harmony import */ var _img_back_png__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./img/back.png */ "./client/img/back.png");
+/* harmony import */ var _webrtc__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./webrtc */ "./client/webrtc.js");
+
+
+
+
+
 
 
 
@@ -33779,31 +34002,31 @@ function CreateTask(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: style,
     id: "form"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default, {
     onSubmit: createServerTask
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "text",
     id: "createSubject",
     placeholder: "Class"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "textarea",
     id: "createTitle",
     placeholder: "Brief Overview"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "date",
     id: "createDate"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "time",
     id: "createTime"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     as: "select",
     id: "createLength"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
@@ -33822,15 +34045,15 @@ function CreateTask(props) {
     value: "105"
   }, "01:45"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
     value: "120"
-  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
+  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, {
     style: {
       color: "transparent"
     }
-  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__.default, {
+  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__.default, {
     type: "submit"
   }, "Submit form"))))));
 }
@@ -33906,29 +34129,29 @@ function EditTask(props) {
       textAlign: "center",
       margin: "auto"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "text",
     id: "editSubject",
     placeholder: "Class"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "textarea",
     id: "editTitle",
     placeholder: "Brief Overview"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "date",
     id: "editDate"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "time",
     id: "editTime"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     as: "select",
     id: "editLength"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
@@ -33947,26 +34170,26 @@ function EditTask(props) {
     value: "105"
   }, "01:45"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
     value: "120"
-  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
+  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, {
     style: {
       color: "transparent"
     }
-  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__.default, {
+  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__.default, {
     onClick: editServerTask,
     variant: "warning"
-  }, "Update changes")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Group, {
+  }, "Update changes")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_5__.default.Label, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, {
     style: {
       color: "transparent"
     }
-  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__.default, {
+  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__.default, {
     onClick: removeServerTask,
     variant: "danger"
   }, "Remove meeting"))))));
@@ -34051,7 +34274,7 @@ function Hour(props) {
 }
 
 function Header(props) {
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_7__.default, {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_12__.default, {
     borderless: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", {
     className: "headers"
@@ -34100,7 +34323,7 @@ function Week(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     id: "currentTime",
     className: "currentTime"
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_7__.default, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_12__.default, {
     bordered: true,
     hover: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("tbody", null, Array.from({
@@ -34154,38 +34377,129 @@ function Week(props) {
   })))));
 }
 
-var tracks = [];
+var mediaSettings = [true, true];
 
 function Meeting(props) {
-  const [updater, setUpdate] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(tracks.length);
   const style = {
     position: "absolute",
+    display: "none",
     zIndex: 10000,
     width: "80%",
     height: "80%",
-    margin: "0 10% 0 10%"
+    margin: "0 10% 0 10%",
+    filter: "blur(10)"
   };
-  var interval = null;
-  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
-    interval = setInterval(() => {
-      if (tracks.length != updater) {
-        reset();
-      }
-    }, 1000);
-  }, [updater]);
-
-  function reset() {
-    clearInterval(interval);
-    interval = null;
-    console.log(updater);
-    setUpdate(tracks.length);
-  }
-
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: style,
     className: "hidden",
     id: "video"
-  }, " ");
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    id: "meetingVideos",
+    className: "meetingVideos back"
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(CallButtons, null));
+}
+
+var inMeeting = false;
+var muted = false;
+var cameraOff = false;
+
+function CallButtons(props) {
+  const style = {
+    position: "relative",
+    display: "flex",
+    margin: "auto",
+    width: "30%",
+    height: "10%",
+    bottom: "10%",
+    zIndex: 20000000000000000000000000
+  };
+
+  function joinCall(e) {
+    if (!conn) {
+      return;
+    } else if (inMeeting) {
+      leaveCall(e);
+      return;
+    }
+
+    console.log("join");
+    inMeeting = true;
+    createVid("localhost", conn.media);
+    conn.sendToAll("joinCall", mediaSettings);
+    Object.keys(videos).forEach(element => {
+      if (element != "localhost") {
+        videos[element].muted = false;
+      }
+    });
+    var button = document.getElementById("joinleave");
+    button.className = "circleButton leave";
+    document.getElementById("joinimg").src = _img_end_png__WEBPACK_IMPORTED_MODULE_7__.default;
+  }
+
+  function leaveCall(e) {
+    inMeeting = false;
+    console.log("leave");
+    Object.keys(videos).forEach(element => {
+      if (element != "localhost") {
+        videos[element].muted = true;
+      }
+    });
+    removeVid("localhost");
+    conn.sendToAll("leaveCall", "disconnect");
+    document.getElementById("joinleave").className = "circleButton join";
+    document.getElementById("joinimg").src = _img_call_png__WEBPACK_IMPORTED_MODULE_6__.default;
+  }
+
+  function toggleMute(e) {
+    if (muted) {
+      muted = false;
+      document.getElementById("mute").className = "circleButton enabled";
+      conn.media.getAudioTracks()[0].enabled = true;
+    } else {
+      muted = true;
+      document.getElementById("mute").className = "circleButton disabled";
+      conn.media.getAudioTracks()[0].enabled = false;
+    }
+  }
+
+  function toggleCam(e) {
+    if (cameraOff) {
+      cameraOff = false;
+      document.getElementById("cam").className = "circleButton enabled";
+      conn.media.getTracks()[1].enabled = true;
+      videos["localhost"].style.opacity = 1;
+      conn.sendToAll("enabledVideo", mediaSettings);
+    } else {
+      cameraOff = true;
+      document.getElementById("cam").className = "circleButton disabled";
+      conn.media.getTracks()[1].enabled = false;
+      videos["localhost"].style.opacity = 0;
+      conn.sendToAll("disabledVideo", mediaSettings);
+    }
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    style: style
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "circleButton join",
+    onClick: joinCall,
+    id: "joinleave"
+  }, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
+    id: "joinimg",
+    src: _img_call_png__WEBPACK_IMPORTED_MODULE_6__.default
+  }), " "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "circleButton enabled",
+    id: "cam",
+    onClick: toggleCam
+  }, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
+    src: _img_camera_png__WEBPACK_IMPORTED_MODULE_4__.default
+  }), " "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    className: "circleButton enabled",
+    id: "mute",
+    onClick: toggleMute
+  }, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
+    src: _img_mic_png__WEBPACK_IMPORTED_MODULE_5__.default
+  }), " "));
 }
 
 var name = "";
@@ -34203,9 +34517,9 @@ function Login(props) {
     style: ui
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     id: "init"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_8__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_13__.default, {
     className: "mb-3"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_9__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_14__.default, {
     id: "name",
     placeholder: "Username",
     onChange: e => {
@@ -34213,7 +34527,7 @@ function Login(props) {
     },
     "aria-label": "Username",
     "aria-describedby": "basic-addon2"
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_8__.default.Append, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_6__.default, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_13__.default.Append, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__.default, {
     onClick: attemptConnection,
     id: "conn",
     variant: "outline-secondary"
@@ -34255,6 +34569,7 @@ function UI(props) {
       document.getElementById("video").style.opacity = 1;
       document.getElementById("week").className = "slideOutRight week";
       document.getElementById("video").className = "slideInRight";
+      document.getElementById("video").style.display = "block";
       setMeeting(true);
     }
   }
@@ -34358,7 +34673,7 @@ var conn;
 
 function connect(_name) {
   console.log("Connecting");
-  conn = new _webrtc__WEBPACK_IMPORTED_MODULE_4__.default(_name);
+  conn = new _webrtc__WEBPACK_IMPORTED_MODULE_9__.default(_name);
   document.getElementById("name").disabled = true;
   document.getElementById("conn").disabled = true;
 
@@ -34366,19 +34681,39 @@ function connect(_name) {
     console.log("Connected!"); //logEvent("Connected to Server!");
 
     document.getElementById("init").style.display = 'none';
-    var track = document.createElement('video');
-    track.srcObject = conn.media;
-    track.autoplay = true;
-    track.muted = true;
-    document.getElementById("video").appendChild(track);
   };
 
-  conn.onMessage = function (data) {//addText(data.user, data.message);
+  conn.onJoinCall = function (data) {
+    //console.log(data);
+    createVid(data.user, conn.tracks[data.user]); //console.log(conn.media);
+    //addText(data.user, data.message);
   };
 
-  conn.onConn = function (data) {
-    console.log("Created Player"); //console.log(document.getElementById("canvas"));
+  conn.onDisabledVideo = function (user) {
+    console.log("disabled!"); //document.getElementById(user).style.opacity = 0;
+
+    videos[user].style.opacity = "0";
+  };
+
+  conn.onEnabledVideo = function (user) {
+    videos[user].style.opacity = "1";
+  };
+
+  conn.onLeaveCall = function (user) {
+    removeVid(user);
+  };
+
+  conn.onConn = function (data) {//console.log(document.getElementById("canvas"));
     //document.getElementById("canvas").innerHTML += players[data];
+  };
+
+  conn.onNewChannel = function (data) {
+    console.log(data);
+
+    if (inMeeting) {
+      console.log("sending to new user!");
+      conn.sendToUser("joinCall", data, mediaSettings);
+    }
   };
 
   conn.log = function (data) {//logEvent(data);
@@ -34387,15 +34722,60 @@ function connect(_name) {
   conn.onDis = function (data) {//update = true;
   };
 
-  conn.onNewTrack = function (data) {
-    console.log(data);
-    var track = document.createElement('video');
-    track.srcObject = data;
-    track.autoplay = true;
-    tracks.push(track);
-    document.getElementById("video").appendChild(track);
+  conn.onNewTrack = function (name, data) {
+    console.log(data); //createVid(name, data);
   };
 }
+
+var videos = {};
+
+function createVid(name, data) {
+  document.getElementById("meetingVideos").className = "meetingVideos";
+
+  if (document.getElementById(name)) {
+    return;
+  }
+
+  var container = document.createElement('div');
+  container.id = name;
+  container.className = "videoBox";
+  var track = document.createElement('video');
+  track.srcObject = data;
+  track.autoplay = true;
+
+  if (!inMeeting || name == "localhost") {
+    track.muted = true;
+  }
+
+  videos[name] = track;
+  container.appendChild(track);
+  document.getElementById("meetingVideos").appendChild(container);
+}
+
+function removeVid(name) {
+  if (!videos[name]) {
+    return;
+  }
+
+  videos[name].remove();
+  document.getElementById(name).remove();
+  delete videos[name];
+
+  if (Object.keys(videos).length == 0) {
+    document.getElementById("meetingVideos").className = "meetingVideos back";
+  }
+}
+/*
+function createVid(name, data) {
+
+    var track = document.createElement('video');
+    track.id = name;
+    track.srcObject = data;
+    track.autoplay = true;
+    track.muted = true;
+    track.className = "blur";
+    document.getElementById("meetingVideos").appendChild(track);
+}*/
 })();
 
 /******/ })()

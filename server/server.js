@@ -167,9 +167,6 @@ wss.on("connection", ws => {
         findWeek(year, month, week);
         break;
 
-
-
-
       //when a user tries to login
       case "login":
         //Check if username is available

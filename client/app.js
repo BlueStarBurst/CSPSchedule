@@ -11,6 +11,14 @@ import Form from 'react-bootstrap/Form'
 import "./style.css"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
+
+import camera from "./img/camera.png";
+import mic from "./img/mic.png";
+import call from "./img/call.png";
+import end from "./img/end.png";
+import back from "./img/back.png";
+
+
 import webrtc from "./webrtc";
 
 var server = new WebSocket("wss://blueserver.us.to:26950/");
@@ -467,39 +475,119 @@ function Week(props) {
     );
 }
 
-var tracks = [];
+var mediaSettings = [true, true];
 
 function Meeting(props) {
 
-    const [updater, setUpdate] = useState(tracks.length);
-
     const style = {
         position: "absolute",
+        display: "none",
         zIndex: 10000,
         width: "80%",
         height: "80%",
         margin: "0 10% 0 10%",
+        filter: "blur(10)"
     }
 
-    var interval = null;
+    return <div style={style} className="hidden" id="video">
+        <div id="meetingVideos" className="meetingVideos back" />
+        <CallButtons />
+    </div>;
+}
 
-    useEffect(() => {
+var inMeeting = false;
+var muted = false;
+var cameraOff = false;
 
-        interval = setInterval(() => {
-            if (tracks.length != updater) {
-                reset();
+function CallButtons(props) {
+
+    const style = {
+        position: "relative",
+        display: "flex",
+        margin: "auto",
+        width: "30%",
+        height: "10%",
+        bottom: "10%",
+        zIndex: 20000000000000000000000000
+    }
+
+    function joinCall(e) {
+
+        if (!conn) {
+            return;
+        } else if (inMeeting) {
+            leaveCall(e);
+            return;
+        }
+
+        console.log("join");
+
+        inMeeting = true;
+
+        createVid("localhost", conn.media);
+
+        conn.sendToAll("joinCall", mediaSettings);
+
+        Object.keys(videos).forEach(element => {
+            if (element != "localhost") {
+                videos[element].muted = false;
             }
-        }, 1000);
-    }, [updater]);
+        });
 
-    function reset() {
-        clearInterval(interval);
-        interval = null;
-        console.log(updater);
-        setUpdate(tracks.length);
+        var button = document.getElementById("joinleave");
+        button.className = "circleButton leave";
+        document.getElementById("joinimg").src = end;
     }
 
-    return <div style={style} className="hidden" id="video"> </div>;
+    function leaveCall(e) {
+        inMeeting = false;
+        console.log("leave");
+        Object.keys(videos).forEach(element => {
+            if (element != "localhost") {
+                videos[element].muted = true;
+            }
+        });
+
+        removeVid("localhost");
+        conn.sendToAll("leaveCall", "disconnect");
+
+        document.getElementById("joinleave").className = "circleButton join";
+        document.getElementById("joinimg").src = call;
+    }
+
+    function toggleMute(e) {
+        if (muted) {
+            muted = false;
+            document.getElementById("mute").className = "circleButton enabled";
+            conn.media.getAudioTracks()[0].enabled = true;
+        } else {
+            muted = true;
+            document.getElementById("mute").className = "circleButton disabled";
+            conn.media.getAudioTracks()[0].enabled = false;
+        }
+    }
+
+    function toggleCam(e) {
+        if (cameraOff) {
+            cameraOff = false;
+            document.getElementById("cam").className = "circleButton enabled";
+            conn.media.getTracks()[1].enabled = true;
+            videos["localhost"].style.opacity = 1;
+            conn.sendToAll("enabledVideo", mediaSettings);
+        } else {
+            cameraOff = true;
+            document.getElementById("cam").className = "circleButton disabled";
+            conn.media.getTracks()[1].enabled = false;
+            videos["localhost"].style.opacity = 0;
+            conn.sendToAll("disabledVideo", mediaSettings);
+        }
+    }
+
+    return <div style={style}>
+        <div className="circleButton join" onClick={joinCall} id="joinleave"> <img id="joinimg" src={call} /> </div>
+        <div className="circleButton enabled" id="cam" onClick={toggleCam}> <img src={camera} /> </div>
+        <div className="circleButton enabled" id="mute" onClick={toggleMute}> <img src={mic} /> </div>
+    </div>
 }
 
 var name = "";
@@ -571,6 +659,7 @@ function UI(props) {
             document.getElementById("video").style.opacity = 1;
             document.getElementById("week").className = "slideOutRight week";
             document.getElementById("video").className = "slideInRight";
+            document.getElementById("video").style.display = "block";
             setMeeting(true);
         }
     }
@@ -692,22 +781,40 @@ function connect(_name) {
         console.log("Connected!");
         //logEvent("Connected to Server!");
         document.getElementById("init").style.display = 'none';
-        var track = document.createElement('video');
-        track.srcObject = conn.media;
-        track.autoplay = true;
-        track.muted = true;
-        document.getElementById("video").appendChild(track);
-
     }
 
-    conn.onMessage = function (data) {
+    conn.onJoinCall = function (data) {
+        //console.log(data);
+        createVid(data.user, conn.tracks[data.user]);
+        //console.log(conn.media);
         //addText(data.user, data.message);
     }
 
+    conn.onDisabledVideo = function (user) {
+        console.log("disabled!");
+        //document.getElementById(user).style.opacity = 0;
+        videos[user].style.opacity = "0";
+    }
+
+    conn.onEnabledVideo = function (user) {
+        videos[user].style.opacity = "1";
+    }
+
+    conn.onLeaveCall = function (user) {
+        removeVid(user);
+    }
+
     conn.onConn = function (data) {
-        console.log("Created Player");
         //console.log(document.getElementById("canvas"));
         //document.getElementById("canvas").innerHTML += players[data];
+    }
+
+    conn.onNewChannel = function (data) {
+        console.log(data);
+        if (inMeeting) {
+            console.log("sending to new user!");
+            conn.sendToUser("joinCall", data, mediaSettings);
+        }
     }
     conn.log = function (data) {
         //logEvent(data);
@@ -717,12 +824,56 @@ function connect(_name) {
         //update = true;
     }
 
-    conn.onNewTrack = function (data) {
+    conn.onNewTrack = function (name, data) {
         console.log(data);
-        var track = document.createElement('video');
-        track.srcObject = data;
-        track.autoplay = true;
-        tracks.push(track);
-        document.getElementById("video").appendChild(track);
+
+        //createVid(name, data);
     }
 }
+
+
+var videos = {};
+function createVid(name, data) {
+    document.getElementById("meetingVideos").className = "meetingVideos";
+    if (document.getElementById(name)) {
+        return;
+    }
+    var container = document.createElement('div');
+    container.id = name;
+    container.className = "videoBox";
+
+    var track = document.createElement('video');
+    track.srcObject = data;
+    track.autoplay = true;
+    if (!inMeeting || name == "localhost") {
+        track.muted = true;
+    }
+    videos[name] = track;
+    container.appendChild(track)
+    document.getElementById("meetingVideos").appendChild(container);
+}
+
+function removeVid(name) {
+    if (!videos[name]) {
+        return
+    }
+    videos[name].remove();
+    document.getElementById(name).remove();
+    delete videos[name];
+
+    if (Object.keys(videos).length == 0) {
+        document.getElementById("meetingVideos").className = "meetingVideos back";
+    }
+}
+
+/*
+function createVid(name, data) {
+
+    var track = document.createElement('video');
+    track.id = name;
+    track.srcObject = data;
+    track.autoplay = true;
+    track.muted = true;
+    track.className = "blur";
+    document.getElementById("meetingVideos").appendChild(track);
+}*/
