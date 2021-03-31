@@ -328,8 +328,8 @@ class webrtc {
         case "connected":
           console.log(`The connection with ${_name} was successful!`); //self.onNewTrack(_name, self.tracks[_name]);
           //self.log(`The connection with ${_name} was successful!`);
+          //self.onConn(_name);
 
-          self.onConn(_name);
           break;
 
         case "connecting":
@@ -429,6 +429,8 @@ class webrtc {
 
 
   onConnect() {}
+
+  onConn() {}
 
   onMessage() {}
 
@@ -34377,6 +34379,21 @@ function Week(props) {
   })))));
 }
 
+function Overlay(props) {
+  const style = {
+    display: "none",
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    "backdropFilter": "blur(6px)",
+    zIndex: "20000000000000000000000000000000000000000000000000000000000000000000"
+  };
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    style: style,
+    id: "blurOver"
+  });
+}
+
 var mediaSettings = [true, true];
 
 function Meeting(props) {
@@ -34393,7 +34410,7 @@ function Meeting(props) {
     style: style,
     className: "hidden",
     id: "video"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Overlay, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     id: "meetingVideos",
     className: "meetingVideos back"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(CallButtons, null));
@@ -34431,9 +34448,12 @@ function CallButtons(props) {
         videos[element].muted = false;
       }
     });
+    document.getElementById("blurOver").style.display = "none";
     var button = document.getElementById("joinleave");
     button.className = "circleButton leave";
     document.getElementById("joinimg").src = _img_end_png__WEBPACK_IMPORTED_MODULE_7__.default;
+    toggleCam(e);
+    toggleCam(e);
   }
 
   function leaveCall(e) {
@@ -34448,6 +34468,7 @@ function CallButtons(props) {
     conn.sendToAll("leaveCall", "disconnect");
     document.getElementById("joinleave").className = "circleButton join";
     document.getElementById("joinimg").src = _img_call_png__WEBPACK_IMPORTED_MODULE_6__.default;
+    document.getElementById("blurOver").style.display = "block";
   }
 
   function toggleMute(e) {
@@ -34685,8 +34706,14 @@ function connect(_name) {
 
   conn.onJoinCall = function (data) {
     //console.log(data);
-    createVid(data.user, conn.tracks[data.user]); //console.log(conn.media);
+    createVid(data.user, conn.tracks[data.user]);
+
+    if (!inMeeting) {
+      console.log("oh no");
+      document.getElementById("blurOver").style.display = "block";
+    } //console.log(conn.media);
     //addText(data.user, data.message);
+
   };
 
   conn.onDisabledVideo = function (user) {
@@ -34701,10 +34728,6 @@ function connect(_name) {
 
   conn.onLeaveCall = function (user) {
     removeVid(user);
-  };
-
-  conn.onConn = function (data) {//console.log(document.getElementById("canvas"));
-    //document.getElementById("canvas").innerHTML += players[data];
   };
 
   conn.onNewChannel = function (data) {
@@ -34723,7 +34746,7 @@ function connect(_name) {
   };
 
   conn.onNewTrack = function (name, data) {
-    console.log(data); //createVid(name, data);
+    console.log(data);
   };
 }
 
@@ -34763,6 +34786,7 @@ function removeVid(name) {
 
   if (Object.keys(videos).length == 0) {
     document.getElementById("meetingVideos").className = "meetingVideos back";
+    document.getElementById("blurOver").style.display = "none";
   }
 }
 /*

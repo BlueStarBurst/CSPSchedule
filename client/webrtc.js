@@ -233,7 +233,7 @@ export default class webrtc {
                     console.log(`The connection with ${_name} was successful!`);
                     //self.onNewTrack(_name, self.tracks[_name]);
                     //self.log(`The connection with ${_name} was successful!`);
-                    self.onConn(_name);
+                    //self.onConn(_name);
                     break;
                 case "connecting":
                     //setTimeout(self.reconnect(_name), 10000 );
@@ -316,6 +316,7 @@ export default class webrtc {
     // redefinable functions!
 
     onConnect() { };
+    onConn() { };
     onMessage() { };
     log() { };
     onDis() { };

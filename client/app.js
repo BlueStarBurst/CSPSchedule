@@ -475,6 +475,18 @@ function Week(props) {
     );
 }
 
+function Overlay(props) {
+    const style = {
+        display: "none",
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        "backdropFilter": "blur(6px)",
+        zIndex: "20000000000000000000000000000000000000000000000000000000000000000000"
+    }
+    return (<div style={style} id="blurOver" />);
+}
+
 var mediaSettings = [true, true];
 
 function Meeting(props) {
@@ -490,6 +502,7 @@ function Meeting(props) {
     }
 
     return <div style={style} className="hidden" id="video">
+        <Overlay />
         <div id="meetingVideos" className="meetingVideos back" />
         <CallButtons />
     </div>;
@@ -534,9 +547,14 @@ function CallButtons(props) {
             }
         });
 
+        document.getElementById("blurOver").style.display = "none";
+
         var button = document.getElementById("joinleave");
         button.className = "circleButton leave";
         document.getElementById("joinimg").src = end;
+
+        toggleCam(e);
+        toggleCam(e);
     }
 
     function leaveCall(e) {
@@ -553,6 +571,7 @@ function CallButtons(props) {
 
         document.getElementById("joinleave").className = "circleButton join";
         document.getElementById("joinimg").src = call;
+        document.getElementById("blurOver").style.display = "block";
     }
 
     function toggleMute(e) {
@@ -786,6 +805,10 @@ function connect(_name) {
     conn.onJoinCall = function (data) {
         //console.log(data);
         createVid(data.user, conn.tracks[data.user]);
+        if (!inMeeting) {
+            console.log("oh no");
+            document.getElementById("blurOver").style.display = "block";
+        }
         //console.log(conn.media);
         //addText(data.user, data.message);
     }
@@ -802,11 +825,6 @@ function connect(_name) {
 
     conn.onLeaveCall = function (user) {
         removeVid(user);
-    }
-
-    conn.onConn = function (data) {
-        //console.log(document.getElementById("canvas"));
-        //document.getElementById("canvas").innerHTML += players[data];
     }
 
     conn.onNewChannel = function (data) {
@@ -827,7 +845,6 @@ function connect(_name) {
     conn.onNewTrack = function (name, data) {
         console.log(data);
 
-        //createVid(name, data);
     }
 }
 
@@ -863,6 +880,7 @@ function removeVid(name) {
 
     if (Object.keys(videos).length == 0) {
         document.getElementById("meetingVideos").className = "meetingVideos back";
+        document.getElementById("blurOver").style.display = "none";
     }
 }
 
