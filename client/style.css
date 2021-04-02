@@ -1,7 +1,8 @@
+/* all the styles defined by classnames or object types */
+
 ::root {
   --blue: blue;
 }
-
 
 html {
   scroll-behavior: smooth;

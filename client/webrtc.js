@@ -2,13 +2,15 @@ export default class webrtc {
 
     constructor(_name) {
 
+        // using googles stun server cuz they didn't say no
         this.STUN = {
             urls: 'stun:stun.l.google.com:19302'
         };
 
+        // used to ask for media
         this.mediaConstraints = {
-            audio: true, // We want an audio track
-            video: true // ...and we want a video track
+            audio: true, 
+            video: true 
         };
 
         this.config = {
@@ -27,6 +29,7 @@ export default class webrtc {
         this.server();
     }
 
+    // connect to server and assign message types
     async server() {
         this.serverConnection = await this.connect();
         this.serverConnection.onmessage = message => {
@@ -67,11 +70,13 @@ export default class webrtc {
         })
     }
 
+    // when user leaves
     async onLeave(data) {
         delete this.peers[data];
         delete this.channels[data];
     }
 
+    // connects to wss
     async connect() {
         this.media = await navigator.mediaDevices.getUserMedia(
             {
@@ -93,6 +98,7 @@ export default class webrtc {
         });
     }
 
+    // create offers and send them to all webrtc users
     async offerToAll() {
         Object.keys(this.peers).forEach(async element => {
             const offer = await this.peers[element].createOffer();
@@ -101,6 +107,7 @@ export default class webrtc {
         });
     }
 
+    // when recieves answer via ws
     async onAnswer({ answer, sender }) {
         if (this.peers[sender].connectionState == "stable")
             return;
@@ -113,6 +120,7 @@ export default class webrtc {
         console.log(this.peers);
     }
 
+    // when recieves offer via ws
     async onOffer({ offer, name }) {
         if (this.peers[name].connectionState == "stable")
             return;
@@ -128,11 +136,13 @@ export default class webrtc {
         console.log(this.peers);
     }
 
+    // when recieves candidate via ws
     async onCandidate(data) {
         //console.log(data);
         this.peers[data.sender].addIceCandidate(data.candidate);
     }
 
+    // init webrtc create offer to all
     users(data) {
         if (!data.success) {
             return;
@@ -145,12 +155,14 @@ export default class webrtc {
         this.offerToAll();
     }
 
+    // update the users in the peer list
     updateUsers(data) {
         if (!this.peers[data.user.userName]) {
             this.createPeer(data.user.userName);
         }
     }
 
+    // creates a rtc peer connection
     async createPeer(_name) {
         var peerConnection = new RTCPeerConnection(this.config);
 
@@ -251,18 +263,11 @@ export default class webrtc {
             }
         }
 
-        /*
-        peerConnection.onnegotiationneeded = async ev => {
-            //peerConnection = await self.createPeer(_name);
-            const offer = await peerConnection.createOffer();
-            await peerConnection.setLocalDescription(offer);
-            self.send({ type: "offer", offer: offer, name: _name });
-        };*/
-
         this.peers[_name] = peerConnection;
         return true;
     }
 
+    // tries to reconnect to webrtc clients
     reconnect(_name) {
         console.log("reconnecting...");
         if (this.peers[_name].connectionState == "connecting") {
@@ -270,6 +275,7 @@ export default class webrtc {
         }
     }
 
+    // just in case offer and answer doesn't work first time
     async reOffer(_name) {
         if (this.peers[_name].localDescription.type == "offer") {
             return;

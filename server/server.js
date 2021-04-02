@@ -1,3 +1,4 @@
+// imports ^w^
 const express = require("express");
 const WebSocket = require("ws");
 const fs = require('fs');
@@ -8,16 +9,17 @@ const capp = express();
 var path = require('path');
 var { v4: uuidv4 } = require('uuid');
 
+// ssl certificates for running https 
 const serverConfig = {
   key: fs.readFileSync(__dirname + '/key.pem'),
   cert: fs.readFileSync(__dirname + '/cert.pem'),
 };
 
+// ports that the client can access
 const HTTPS_PORT = 443;
+const port = 26950;
 
-const port = process.env.PORT || 26950;
-
-//initialize a http server
+// create a https server and provide accessible files
 const server = https.createServer(serverConfig, app);
 
 capp.get('/', function (req, res) {
@@ -29,7 +31,7 @@ capp.use(express.static('docs'))
 const httpsServer = https.createServer(serverConfig, capp);
 httpsServer.listen(HTTPS_PORT, '0.0.0.0');
 
-
+// redirect to https :/
 http.createServer(function (req, res) {
   res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
   res.end();
@@ -39,8 +41,10 @@ http.createServer(function (req, res) {
 //initialize the WebSocket server instance
 const wss = new WebSocket.Server({ server });
 
+// store socket users and webrtc users
 let users = new Map();
 
+// create a schedule and fill it with the last saved JSON schedule if available 
 let schedule = {};
 try {
   schedule = JSON.parse(fs.readFileSync(__dirname + '/schedule.json', 'utf8'));
@@ -48,7 +52,7 @@ try {
   saveSchedule();
 }
 
-
+// save the current schedule to schedule.json :3
 function saveSchedule() {
   fs.writeFile(__dirname + '/schedule.json', JSON.stringify(schedule), function (err) {
     if (err) throw err;
@@ -56,10 +60,12 @@ function saveSchedule() {
   });
 }
 
+// send to specific ws (websocket) connection
 const sendTo = (connection, message) => {
   connection.send(JSON.stringify(message));
 };
 
+// send to all websocket connections
 const sendToAll = (clients, type, { id, name: userName }) => {
   Object.values(clients).forEach(client => {
     if (client.name !== userName) {
@@ -73,6 +79,7 @@ const sendToAll = (clients, type, { id, name: userName }) => {
   });
 };
 
+// find specific week meetings in the saved schedule and return it
 function findWeek(year, month, week) {
   var arr = [];
   if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
@@ -92,22 +99,24 @@ function findWeek(year, month, week) {
     type: "week",
     data: arr
   }
-  //return JSON.stringify(returnMessage);
-  //console.log(users);
+
   for (element of users.values()) {
     element.send(JSON.stringify(returnMessage));
   }
 
+  // save the schedule to the JSON file
   saveSchedule();
 }
 
+// when the websocket server recieves a connection
 wss.on("connection", ws => {
 
   ws.name = uuidv4();
   users.set(ws.name, ws);
-  //console.log(users);
 
   ws.on("message", msg => {
+
+    // read the JSON data
     let data;
 
     try {
@@ -118,11 +127,14 @@ wss.on("connection", ws => {
     }
 
     const { type, name, offer, answer, candidate, sender } = data;
+    // does different tasks based on message type
     switch (type) {
       case "getWeek":
+        // initial request for the schedule
         findWeek(data.year, data.month, data.week);
         break;
       case "createTask":
+        // create a new task and add it to the schedule
         console.log(schedule);
         console.log(data.data);
 
@@ -145,6 +157,7 @@ wss.on("connection", ws => {
         findWeek(year, month, week);
         break;
       case "editTask":
+        // when a user asks to edit a meeing
         var [year, month, week] = data.data.date.split("-");
         week = Math.floor(week / 7);
         month = parseInt(month);
@@ -155,6 +168,7 @@ wss.on("connection", ws => {
         findWeek(year, month, week);
         break;
       case "removeTask":
+        // when user asks to remove a meeting
         var [year, month, week] = data.date.split("-");
         week = Math.floor(week / 7);
         month = parseInt(month);
@@ -167,16 +181,18 @@ wss.on("connection", ws => {
         findWeek(year, month, week);
         break;
 
-      //when a user tries to login
+      //when a user tries to login with webrtc
       case "login":
-        //Check if username is available
+        //if username is available
         if (users[name]) {
+          // not available
           sendTo(ws, {
             type: "login",
             success: false,
             message: "Username is unavailable"
           });
         } else {
+          // create a new user for webrtc
           const id = uuidv4();
           const loggedIn = Object.values(
             users
@@ -225,6 +241,7 @@ wss.on("connection", ws => {
         }
         break;
       case "candidate":
+        //send candidate info to other client 
         const candidateRecipient = users[name];
         if (!!candidateRecipient) {
           sendTo(candidateRecipient, {
@@ -235,13 +252,11 @@ wss.on("connection", ws => {
         }
         break;
       case "leave":
+        // when a user leaves webrtc
         sendToAll(users, "leave", ws);
         break;
-
-
-
-
       default:
+        // if the type doesn't exist!
         console.log("oh no! That's not a valid request!");
         ws.send(JSON.stringify({ error: "oh no! That's not a valid request! /)m(\\" }))
         break;
@@ -249,11 +264,13 @@ wss.on("connection", ws => {
 
   });
 
+  // when someone closes connection (closing or refreshing page)
   ws.on("close", function () {
     delete users[ws.name];
     sendToAll(users, "leave", ws);
   });
 
+  // send welcome message!
   ws.send(
     JSON.stringify({
       type: "connect",

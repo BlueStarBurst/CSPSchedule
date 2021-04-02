@@ -73,14 +73,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ });
 class webrtc {
   constructor(_name) {
+    // using googles stun server cuz they didn't say no
     this.STUN = {
       urls: 'stun:stun.l.google.com:19302'
-    };
+    }; // used to ask for media
+
     this.mediaConstraints = {
       audio: true,
-      // We want an audio track
-      video: true // ...and we want a video track
-
+      video: true
     };
     this.config = {
       iceServers: [this.STUN]
@@ -91,7 +91,8 @@ class webrtc {
     this.tracks = {};
     this.serverConnection;
     this.server();
-  }
+  } // connect to server and assign message types
+
 
   async server() {
     this.serverConnection = await this.connect();
@@ -142,12 +143,14 @@ class webrtc {
       type: "login",
       name: this.user
     });
-  }
+  } // when user leaves
+
 
   async onLeave(data) {
     delete this.peers[data];
     delete this.channels[data];
-  }
+  } // connects to wss
+
 
   async connect() {
     this.media = await navigator.mediaDevices.getUserMedia({
@@ -174,7 +177,8 @@ class webrtc {
         reject(err);
       };
     });
-  }
+  } // create offers and send them to all webrtc users
+
 
   async offerToAll() {
     Object.keys(this.peers).forEach(async element => {
@@ -186,7 +190,8 @@ class webrtc {
         name: element
       });
     });
-  }
+  } // when recieves answer via ws
+
 
   async onAnswer({
     answer,
@@ -198,7 +203,8 @@ class webrtc {
     this.peers[sender].setRemoteDescription(new RTCSessionDescription(answer));
     console.log(this.channels);
     console.log(this.peers);
-  }
+  } // when recieves offer via ws
+
 
   async onOffer({
     offer,
@@ -217,12 +223,14 @@ class webrtc {
       sender: this.user
     });
     console.log(this.peers);
-  }
+  } // when recieves candidate via ws
+
 
   async onCandidate(data) {
     //console.log(data);
     this.peers[data.sender].addIceCandidate(data.candidate);
-  }
+  } // init webrtc create offer to all
+
 
   users(data) {
     if (!data.success) {
@@ -235,13 +243,15 @@ class webrtc {
       }
     });
     this.offerToAll();
-  }
+  } // update the users in the peer list
+
 
   updateUsers(data) {
     if (!this.peers[data.user.userName]) {
       this.createPeer(data.user.userName);
     }
-  }
+  } // creates a rtc peer connection
+
 
   async createPeer(_name) {
     var peerConnection = new RTCPeerConnection(this.config);
@@ -349,18 +359,11 @@ class webrtc {
           break;
       }
     };
-    /*
-    peerConnection.onnegotiationneeded = async ev => {
-        //peerConnection = await self.createPeer(_name);
-        const offer = await peerConnection.createOffer();
-        await peerConnection.setLocalDescription(offer);
-        self.send({ type: "offer", offer: offer, name: _name });
-    };*/
-
 
     this.peers[_name] = peerConnection;
     return true;
-  }
+  } // tries to reconnect to webrtc clients
+
 
   reconnect(_name) {
     console.log("reconnecting...");
@@ -368,7 +371,8 @@ class webrtc {
     if (this.peers[_name].connectionState == "connecting") {
       this.peers[_name].restartIce();
     }
-  }
+  } // just in case offer and answer doesn't work first time
+
 
   async reOffer(_name) {
     if (this.peers[_name].localDescription.type == "offer") {
@@ -534,7 +538,7 @@ var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBP
 var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(_img_novideo_png__WEBPACK_IMPORTED_MODULE_3__.default);
 var ___CSS_LOADER_URL_REPLACEMENT_1___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(_img_back_png__WEBPACK_IMPORTED_MODULE_4__.default);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ");\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"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","sourcesContent":["::root {\r\n  --blue: blue;\r\n}\r\n\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(img/novideo.png);\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(img/back.png);\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "/* all the styles defined by classnames or object types */\r\n\r\n::root {\r\n  --blue: blue;\r\n}\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ");\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"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","sourcesContent":["/* all the styles defined by classnames or object types */\r\n\r\n::root {\r\n  --blue: blue;\r\n}\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(img/novideo.png);\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(img/back.png);\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -33889,6 +33893,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _img_end_png__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./img/end.png */ "./client/img/end.png");
 /* harmony import */ var _img_back_png__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./img/back.png */ "./client/img/back.png");
 /* harmony import */ var _webrtc__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./webrtc */ "./client/webrtc.js");
+//lots of imports
 
 
 
@@ -33904,19 +33909,25 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+ // call to the webrtc class in webrtc.js
 
+ // create connection to desired wss 
 
-var server = new WebSocket("wss://blueserver.us.to:26950/"); //var server = new WebSocket("wss://47.184.193.193:26950/");
+var server = new WebSocket("wss://blueserver.us.to:26950/"); // find current date and time and save them
 
 let [month, date, year] = new Date().toLocaleDateString("en-US").split("/");
+console.log(date);
 let day = new Date().getDay();
 let [hour, minute, second] = new Date().toLocaleTimeString("en-US").split(/:| /);
-hour = new Date().getHours();
-let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+hour = new Date().getHours(); // assign days to indexes in an array cuz i don't want to write them 20 times :P
+
+let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; // height of rows
+
 let timeHeight = 150;
-var loading = false;
+var loading = false; // when client connect to server
 
 server.onopen = e => {
+  // get current schedule on server
   var mess = {
     type: "getWeek",
     month: month,
@@ -33925,11 +33936,12 @@ server.onopen = e => {
     year: year
   };
   server.send(JSON.stringify(mess));
-};
+}; // when client recieves message from server
+
 
 server.onmessage = message => {
   message = JSON.parse(message.data);
-  console.log(message);
+  console.log(message); // when user recieves an updated week
 
   if (message.type = "week") {
     if (message.data) {
@@ -33948,15 +33960,33 @@ let subjectStyles = {
     border: "transparent",
     background: "rgba(30, 132, 227, 0.5)"
   },
+  History: {
+    border: "transparent",
+    background: "rgba(255, 51, 204, 0.5)"
+  },
+  Math: {
+    border: "transparent",
+    background: "rgba(255, 51, 51, 0.5)"
+  },
+  English: {
+    border: "transparent",
+    background: "rgba(255, 166, 77, 0.5)"
+  },
+  Science: {
+    border: "transparent",
+    background: "rgba(51, 204, 51, 0.5)"
+  },
   default: {
     border: "transparent",
     background: "rgba(255, 251, 0, 0.5)"
   }
-};
+}; // ready global variables for the selected data and time
+
 var selectedDate;
-var selectedTime;
+var selectedTime; // React component for UI to create a task
 
 function CreateTask(props) {
+  // css style stuff
   var container = {
     "position": "fixed",
     "width": "100vw",
@@ -33975,11 +34005,12 @@ function CreateTask(props) {
     "padding": "40px",
     "borderRadius": "20px",
     "color": "white"
-  };
+  }; // creates a meeting based on values assigned in the component's inputs
 
   function createServerTask(e) {
     e.preventDefault();
-    document.getElementById("createTask").style.display = "none";
+    document.getElementById("createTask").style.display = "none"; // pack the values
+
     var JSONpackage = {
       subject: document.getElementById("createSubject").value,
       date: document.getElementById("createDate").value,
@@ -33991,9 +34022,12 @@ function CreateTask(props) {
     var moveable = {
       type: "createTask",
       data: JSONpackage
-    };
+    }; // send to server
+
     server.send(JSON.stringify(moveable));
-  }
+  } // JSX return
+  // THIS WILL PROMPT USER TO CREATE A MEETING
+
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: container,
@@ -34005,7 +34039,8 @@ function CreateTask(props) {
     style: style,
     id: "form"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default, {
-    onSubmit: createServerTask
+    onSubmit: createServerTask,
+    autocomplete: "off"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "text",
     id: "createSubject",
@@ -34058,11 +34093,13 @@ function CreateTask(props) {
   }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__.default, {
     type: "submit"
   }, "Submit form"))))));
-}
+} // ready selected meeting global variable
 
-var selectedMeeting;
+
+var selectedMeeting; // React component for UI to edit a task
 
 function EditTask(props) {
+  // css style stuff
   var container = {
     "position": "fixed",
     "width": "100vw",
@@ -34081,12 +34118,13 @@ function EditTask(props) {
     "padding": "40px",
     "borderRadius": "20px",
     "color": "white"
-  };
+  }; // called to edit a task based on the values
 
   function editServerTask(e) {
     document.getElementById("editTask").style.display = "none";
     e.preventDefault();
-    document.getElementById("editTask").style.display = "none";
+    document.getElementById("editTask").style.display = "none"; // package the values
+
     var JSONpackage = {
       id: selectedMeeting.id,
       subject: document.getElementById("editSubject").value,
@@ -34100,9 +34138,11 @@ function EditTask(props) {
       type: "editTask",
       id: selectedMeeting.id,
       data: JSONpackage
-    };
+    }; // send new values with type: editTask
+
     server.send(JSON.stringify(moveable));
-  }
+  } // tells the server to remove the task
+
 
   function removeServerTask(e) {
     document.getElementById("editTask").style.display = "none";
@@ -34112,9 +34152,12 @@ function EditTask(props) {
       type: "removeTask",
       date: selectedMeeting.date,
       id: selectedMeeting.id
-    };
+    }; // send the message
+
     server.send(JSON.stringify(moveable));
-  }
+  } // JSX return
+  // THIS WILL PROMPT USER TO EDIT/REMOVE A MEETING
+
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: container,
@@ -34131,7 +34174,9 @@ function EditTask(props) {
       textAlign: "center",
       margin: "auto"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default, {
+    autocomplete: "off"
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "text",
     id: "editSubject",
     placeholder: "Class"
@@ -34195,11 +34240,11 @@ function EditTask(props) {
     onClick: removeServerTask,
     variant: "danger"
   }, "Remove meeting"))))));
-}
+} // the task React component that shows up in the calendar table
+
 
 function Task(props) {
-  //console.log(props.meeting)
-  //console.log(timeHeight * (props.meeting.len / 60) + "px")
+  // use styles that are predifined in the subjectStyles
   var sub;
 
   if (subjectStyles[props.meeting.subject]) {
@@ -34208,7 +34253,7 @@ function Task(props) {
     sub = subjectStyles.default;
   }
 
-  var topHeight = parseInt(props.meeting.time.substr(3)) / 60 * timeHeight; //console.log(topHeight);
+  var topHeight = parseInt(props.meeting.time.substr(3)) / 60 * timeHeight; // more style stuff
 
   var style = {
     "backgroundColor": sub.background,
@@ -34218,7 +34263,7 @@ function Task(props) {
     "borderRadius": "10px",
     "border": "2px " + sub.border + " solid",
     "overflow": "auto"
-  };
+  }; // when clicked
 
   function clicks(e) {
     e.preventDefault();
@@ -34229,10 +34274,8 @@ function Task(props) {
     document.getElementById("editTime").value = props.meeting.time;
     document.getElementById("editLength").value = props.meeting.len;
     selectedMeeting = props.meeting;
-    /*
-    document.getElementById("createDate").value = "2021-03-" + props.meeting.date;
-    document.getElementById("createTime").value = props.meeting.hour + ":00";*/
-  }
+  } // return JSX
+
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: style,
@@ -34240,19 +34283,23 @@ function Task(props) {
     onClick: clicks,
     id: props.meeting.id + ""
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, props.meeting.text), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("p", null, "Attendees: ", props.meeting.attendees, " "));
-}
+} // The React Component for each hour in the table 
+
 
 function Hour(props) {
-  var text = "";
-  var id = "";
+  // if nothing is defined for the hour, use these values
+  var text = [];
+  var id = ""; // go through the weeklyMeetings array and look for the matching time
 
   for (var i = 0; i < weeklyMeetings.length; i++) {
+    // if the date and time matches, create the Task
     if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2)) {
-      text = /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Task, {
+      text.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Task, {
         meeting: weeklyMeetings[i]
-      });
+      }));
     }
-  }
+  } // when an hour is clicked, show the createTask element
+
 
   function selectHour(e) {
     if (e.target.className != "hour") {
@@ -34261,10 +34308,12 @@ function Hour(props) {
 
     if (click <= 100 && !moving) {
       document.getElementById("createTask").style.display = "block";
-      document.getElementById("createDate").value = "2021-03-" + props.date;
+      console.log(props.realDate);
+      document.getElementById("createDate").value = "2021-03-" + props.realDate;
       document.getElementById("createTime").value = props.hour + ":00";
     }
-  }
+  } // another return JSX
+
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "hour",
@@ -34273,9 +34322,11 @@ function Hour(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "half"
   }), text);
-}
+} // The header of the table with each days date
+
 
 function Header(props) {
+  console.log(props.date);
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_12__.default, {
     borderless: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", {
@@ -34286,14 +34337,21 @@ function Header(props) {
     length: 7
   }).map((_, index) => {
     var num = props.date - day + index;
+
+    if (num < 1) {
+      num = 31 + (props.date - day + index);
+    }
+
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
       key: index,
       className: "header"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h6", null, num), " ", days[index]);
   }))));
-}
+} // The whole week's calendar (table) component
+
 
 function Week(props) {
+  // Prebuilt React methods used to check if the weekly meetings changed
   const [meetings, setMeetings] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(weeklyMeetings);
   var interval;
 
@@ -34310,7 +34368,8 @@ function Week(props) {
         reset();
       }
     }, 1000);
-  });
+  }); // return JSX again
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "week",
     id: "week"
@@ -34331,6 +34390,7 @@ function Week(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("tbody", null, Array.from({
     length: 14
   }).map((_, index) => {
+    //Create each row with assigned time!
     var num = index + 8;
     var time = num;
 
@@ -34361,23 +34421,28 @@ function Week(props) {
     }, num), Array.from({
       length: 7
     }).map((_, index) => {
+      // Create each hour!
       var num = props.date - day + index;
+      console.log(props.date);
       if (num == props.date) return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
         key: index,
         className: "highlighted"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Hour, {
         date: num,
-        hour: time
+        hour: time,
+        realDate: props.date
       }));
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
         key: index
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Hour, {
         date: num,
-        hour: time
+        hour: time,
+        realDate: props.date
       }));
     }));
   })))));
-}
+} // an overlay that blurs webrtc meeting
+
 
 function Overlay(props) {
   const style = {
@@ -34394,9 +34459,10 @@ function Overlay(props) {
   });
 }
 
-var mediaSettings = [true, true];
+var mediaSettings = [true, true]; // the webrtc meeting React component
 
 function Meeting(props) {
+  // woohoo more styles
   const style = {
     position: "absolute",
     display: "none",
@@ -34405,7 +34471,8 @@ function Meeting(props) {
     height: "80%",
     margin: "0 10% 0 10%",
     filter: "blur(10)"
-  };
+  }; // omg! it's a return JSX!
+
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: style,
     className: "hidden",
@@ -34414,13 +34481,15 @@ function Meeting(props) {
     id: "meetingVideos",
     className: "meetingVideos back"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(CallButtons, null));
-}
+} // basic meeting values for use outside components
+
 
 var inMeeting = false;
 var muted = false;
-var cameraOff = false;
+var cameraOff = false; // The Call Buttons React Component
 
 function CallButtons(props) {
+  // style
   const style = {
     position: "relative",
     display: "flex",
@@ -34429,7 +34498,7 @@ function CallButtons(props) {
     height: "10%",
     bottom: "10%",
     zIndex: 20000000000000000000000000
-  };
+  }; // send message through webrtc stating that a client has joined the meeting
 
   function joinCall(e) {
     if (!conn) {
@@ -34451,10 +34520,12 @@ function CallButtons(props) {
     document.getElementById("blurOver").style.display = "none";
     var button = document.getElementById("joinleave");
     button.className = "circleButton leave";
-    document.getElementById("joinimg").src = _img_end_png__WEBPACK_IMPORTED_MODULE_7__.default;
+    document.getElementById("joinimg").src = _img_end_png__WEBPACK_IMPORTED_MODULE_7__.default; //fix init cam off
+
     toggleCam(e);
     toggleCam(e);
-  }
+  } // when client leaves the meeting
+
 
   function leaveCall(e) {
     inMeeting = false;
@@ -34469,7 +34540,8 @@ function CallButtons(props) {
     document.getElementById("joinleave").className = "circleButton join";
     document.getElementById("joinimg").src = _img_call_png__WEBPACK_IMPORTED_MODULE_6__.default;
     document.getElementById("blurOver").style.display = "block";
-  }
+  } // turn on and off the microphone
+
 
   function toggleMute(e) {
     if (muted) {
@@ -34481,7 +34553,8 @@ function CallButtons(props) {
       document.getElementById("mute").className = "circleButton disabled";
       conn.media.getAudioTracks()[0].enabled = false;
     }
-  }
+  } //turn on and off the cam
+
 
   function toggleCam(e) {
     if (cameraOff) {
@@ -34497,7 +34570,8 @@ function CallButtons(props) {
       videos["localhost"].style.opacity = 0;
       conn.sendToAll("disabledVideo", mediaSettings);
     }
-  }
+  } // wowza! more JSX!
+
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: style
@@ -34521,7 +34595,8 @@ function CallButtons(props) {
   }, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
     src: _img_mic_png__WEBPACK_IMPORTED_MODULE_5__.default
   }), " "));
-}
+} // a login for the webrtc connection
+
 
 var name = "";
 
@@ -34543,6 +34618,7 @@ function Login(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_14__.default, {
     id: "name",
     placeholder: "Username",
+    autocomplete: "off",
     onChange: e => {
       name = e.target.value;
     },
@@ -34553,7 +34629,8 @@ function Login(props) {
     id: "conn",
     variant: "outline-secondary"
   }, "Connect!")))));
-}
+} // The component where the calendar meeting and UIs hang out
+
 
 function UI(props) {
   const [meeting, setMeeting] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
@@ -34593,7 +34670,8 @@ function UI(props) {
       document.getElementById("video").style.display = "block";
       setMeeting(true);
     }
-  }
+  } // JSX return
+
 
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: container
@@ -34622,7 +34700,8 @@ function swipe(e) {
   prev[1] = document.getElementById("schedule").scrollTop;
 }
 
-(0,react_dom__WEBPACK_IMPORTED_MODULE_1__.render)( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(UI, null)), document.getElementById("root"));
+(0,react_dom__WEBPACK_IMPORTED_MODULE_1__.render)( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(UI, null)), document.getElementById("root")); // if mouse is moving while holding click or not
+
 var interval;
 var click = 0;
 
@@ -34655,7 +34734,8 @@ document.onmousemove = function (e) {
       document.getElementById("schedule").scroll(prev[0], -1 * (e.clientY - mouse[1]) + prev[1]);
     }
   }
-};
+}; // continuously get current date and time
+
 
 setInterval(() => {
   hour = new Date().getHours();
@@ -34673,7 +34753,8 @@ setInterval(() => {
   }
 
   document.getElementById("currentTime").style.top = totalDist + "px";
-}, 100);
+}, 100); // scroll to current time
+
 setTimeout(() => {
   var myElement = document.getElementById('scroll');
   var topPos = myElement.offsetTop - timeHeight;
@@ -34684,7 +34765,7 @@ setTimeout(() => {
   timeHeight = document.getElementById("scroll").offsetHeight;
   document.getElementById("currentTime").style.opacity = "1";
   document.getElementById("currentTime").classList.add("currentTimeAnim");
-}, 1000);
+}, 1000); // WEBRTC STUFF
 
 function attemptConnection(e) {
   connect(name);
@@ -34705,15 +34786,12 @@ function connect(_name) {
   };
 
   conn.onJoinCall = function (data) {
-    //console.log(data);
     createVid(data.user, conn.tracks[data.user]);
 
     if (!inMeeting) {
-      console.log("oh no");
+      console.log("oh no! you're missing out on the meeting!");
       document.getElementById("blurOver").style.display = "block";
-    } //console.log(conn.media);
-    //addText(data.user, data.message);
-
+    }
   };
 
   conn.onDisabledVideo = function (user) {
@@ -34748,31 +34826,40 @@ function connect(_name) {
   conn.onNewTrack = function (name, data) {
     console.log(data);
   };
-}
+} // Store, create, and remove streams of video and audio sent through webrtc
+
 
 var videos = {};
 
 function createVid(name, data) {
   document.getElementById("meetingVideos").className = "meetingVideos";
+  var alreadyExists = false;
+  var keys = Object.keys(videos);
 
-  if (document.getElementById(name)) {
-    return;
+  for (var i = 0; i < keys.length; i++) {
+    if (keys[i] == name) {
+      alreadyExists = true;
+    }
   }
 
-  var container = document.createElement('div');
-  container.id = name;
-  container.className = "videoBox";
-  var track = document.createElement('video');
-  track.srcObject = data;
-  track.autoplay = true;
+  if (alreadyExists) {
+    var container = document.createElement('div');
+    container.id = name;
+    container.className = "videoBox";
+    var track = document.createElement('video');
+    track.srcObject = data;
+    track.autoplay = true;
 
-  if (!inMeeting || name == "localhost") {
-    track.muted = true;
+    if (!inMeeting || name == "localhost") {
+      track.muted = true;
+    }
+
+    videos[name] = track;
+    container.appendChild(track);
+    document.getElementById("meetingVideos").appendChild(container);
+  } else {
+    console.log("That media stream video already exists!");
   }
-
-  videos[name] = track;
-  container.appendChild(track);
-  document.getElementById("meetingVideos").appendChild(container);
 }
 
 function removeVid(name) {
@@ -34789,17 +34876,6 @@ function removeVid(name) {
     document.getElementById("blurOver").style.display = "none";
   }
 }
-/*
-function createVid(name, data) {
-
-    var track = document.createElement('video');
-    track.id = name;
-    track.srcObject = data;
-    track.autoplay = true;
-    track.muted = true;
-    track.className = "blur";
-    document.getElementById("meetingVideos").appendChild(track);
-}*/
 })();
 
 /******/ })()

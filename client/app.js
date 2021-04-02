@@ -1,3 +1,4 @@
+//lots of imports
 import React, { useEffect, useRef, useState } from 'react'
 import { render } from 'react-dom'
 import Table from 'react-bootstrap/Table'
@@ -18,27 +19,30 @@ import call from "./img/call.png";
 import end from "./img/end.png";
 import back from "./img/back.png";
 
-
+// call to the webrtc class in webrtc.js
 import webrtc from "./webrtc";
 
+// create connection to desired wss 
 var server = new WebSocket("wss://blueserver.us.to:26950/");
-//var server = new WebSocket("wss://47.184.193.193:26950/");
 
+// find current date and time and save them
 let [month, date, year] = new Date().toLocaleDateString("en-US").split("/");
+console.log(date);
 let day = new Date().getDay();
 let [hour, minute, second] = new Date().toLocaleTimeString("en-US").split(/:| /);
 hour = new Date().getHours();
 
+// assign days to indexes in an array cuz i don't want to write them 20 times :P
 let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+// height of rows
 let timeHeight = 150;
 
 var loading = false;
 
-
-
-
+// when client connect to server
 server.onopen = (e) => {
+    // get current schedule on server
     var mess = {
         type: "getWeek",
         month: month,
@@ -49,10 +53,12 @@ server.onopen = (e) => {
     server.send(JSON.stringify(mess));
 }
 
+// when client recieves message from server
 server.onmessage = (message) => {
     message = JSON.parse(message.data);
     console.log(message)
 
+    // when user recieves an updated week
     if (message.type = "week") {
         if (message.data) {
             weeklyMeetings = message.data;
@@ -73,17 +79,36 @@ let subjectStyles = {
         border: "transparent",
         background: "rgba(30, 132, 227, 0.5)"
     },
+    History: {
+        border: "transparent",
+        background: "rgba(255, 51, 204, 0.5)"
+    },
+    Math: {
+        border: "transparent",
+        background: "rgba(255, 51, 51, 0.5)"
+    },
+    English: {
+        border: "transparent",
+        background: "rgba(255, 166, 77, 0.5)"
+    },
+    Science: {
+        border: "transparent",
+        background: "rgba(51, 204, 51, 0.5)"
+    },
     default: {
         border: "transparent",
         background: "rgba(255, 251, 0, 0.5)"
     }
 }
 
+// ready global variables for the selected data and time
 var selectedDate;
 var selectedTime;
 
+// React component for UI to create a task
 function CreateTask(props) {
 
+    // css style stuff
     var container = {
         "position": "fixed",
         "width": "100vw",
@@ -105,9 +130,12 @@ function CreateTask(props) {
         "color": "white"
     }
 
+    // creates a meeting based on values assigned in the component's inputs
     function createServerTask(e) {
         e.preventDefault();
         document.getElementById("createTask").style.display = "none";
+
+        // pack the values
         var JSONpackage = {
             subject: document.getElementById("createSubject").value,
             date: document.getElementById("createDate").value,
@@ -118,13 +146,15 @@ function CreateTask(props) {
         }
         var moveable = {
             type: "createTask",
-
             data: JSONpackage
         }
+
+        // send to server
         server.send(JSON.stringify(moveable));
     }
 
-
+    // JSX return
+    // THIS WILL PROMPT USER TO CREATE A MEETING
     return (
         <div style={container} id="createTask" onClick={function (e) {
             if (e.target.id == "createTask")
@@ -133,7 +163,7 @@ function CreateTask(props) {
             <div style={style} id="form">
                 <h5>Schedule a meeting!</h5>
                 <br />
-                <Form onSubmit={createServerTask}>
+                <Form onSubmit={createServerTask} autocomplete="off">
                     <Form.Row>
                         <Form.Group>
                             <Form.Label>Subject</Form.Label>
@@ -181,9 +211,13 @@ function CreateTask(props) {
     )
 }
 
+// ready selected meeting global variable
 var selectedMeeting;
+
+// React component for UI to edit a task
 function EditTask(props) {
 
+    // css style stuff
     var container = {
         "position": "fixed",
         "width": "100vw",
@@ -205,10 +239,13 @@ function EditTask(props) {
         "color": "white"
     }
 
+    // called to edit a task based on the values
     function editServerTask(e) {
         document.getElementById("editTask").style.display = "none";
         e.preventDefault();
         document.getElementById("editTask").style.display = "none";
+
+        // package the values
         var JSONpackage = {
             id: selectedMeeting.id,
             subject: document.getElementById("editSubject").value,
@@ -223,9 +260,12 @@ function EditTask(props) {
             id: selectedMeeting.id,
             data: JSONpackage
         }
+
+        // send new values with type: editTask
         server.send(JSON.stringify(moveable));
     }
 
+    // tells the server to remove the task
     function removeServerTask(e) {
         document.getElementById("editTask").style.display = "none";
         document.getElementById(selectedMeeting.id + "").className = "removed";
@@ -235,9 +275,12 @@ function EditTask(props) {
             date: selectedMeeting.date,
             id: selectedMeeting.id
         }
+        // send the message
         server.send(JSON.stringify(moveable));
     }
 
+    // JSX return
+    // THIS WILL PROMPT USER TO EDIT/REMOVE A MEETING
     return (
         <div style={container} id="editTask" onClick={function (e) {
             if (e.target.id == "editTask")
@@ -248,7 +291,7 @@ function EditTask(props) {
                     <h5>Schedule a meeting!</h5>
                 </div>
                 <br />
-                <Form >
+                <Form autocomplete="off">
                     <Form.Row>
                         <Form.Group>
                             <Form.Label>Subject</Form.Label>
@@ -301,12 +344,10 @@ function EditTask(props) {
     )
 }
 
-
+// the task React component that shows up in the calendar table
 function Task(props) {
 
-    //console.log(props.meeting)
-    //console.log(timeHeight * (props.meeting.len / 60) + "px")
-
+    // use styles that are predifined in the subjectStyles
     var sub;
 
     if (subjectStyles[props.meeting.subject]) {
@@ -316,8 +357,8 @@ function Task(props) {
     }
 
     var topHeight = (parseInt(props.meeting.time.substr(3)) / 60) * timeHeight;
-    //console.log(topHeight);
 
+    // more style stuff
     var style = {
         "backgroundColor": sub.background,
         "display": "block",
@@ -328,6 +369,7 @@ function Task(props) {
         "overflow": "auto"
     }
 
+    // when clicked
     function clicks(e) {
         e.preventDefault();
         document.getElementById("editTask").style.display = "block";
@@ -339,12 +381,9 @@ function Task(props) {
 
         selectedMeeting = props.meeting;
 
-
-        /*
-        document.getElementById("createDate").value = "2021-03-" + props.meeting.date;
-        document.getElementById("createTime").value = props.meeting.hour + ":00";*/
     }
 
+    // return JSX
     return (
         <div style={style} className="task" onClick={clicks} id={props.meeting.id + ""}>
             <p>{props.meeting.text}</p>
@@ -353,30 +392,35 @@ function Task(props) {
     )
 }
 
+// The React Component for each hour in the table 
 function Hour(props) {
 
-    var text = "";
+    // if nothing is defined for the hour, use these values
+    var text = [];
     var id = "";
 
+    // go through the weeklyMeetings array and look for the matching time
     for (var i = 0; i < weeklyMeetings.length; i++) {
-
+        // if the date and time matches, create the Task
         if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2)) {
-
-            text = <Task meeting={weeklyMeetings[i]} />
+            text.push(<Task meeting={weeklyMeetings[i]} />);
         }
     }
 
+    // when an hour is clicked, show the createTask element
     function selectHour(e) {
         if (e.target.className != "hour") {
             return;
         }
         if (click <= 100 && !moving) {
             document.getElementById("createTask").style.display = "block";
-            document.getElementById("createDate").value = "2021-03-" + props.date;
+            console.log(props.realDate);
+            document.getElementById("createDate").value = "2021-03-" + props.realDate;
             document.getElementById("createTime").value = props.hour + ":00";
         }
     }
 
+    // another return JSX
     return (
         <div className="hour" id={id} onClick={selectHour}>
             <div className="half"></div>
@@ -385,8 +429,9 @@ function Hour(props) {
     )
 }
 
+// The header of the table with each days date
 function Header(props) {
-
+    console.log(props.date)
     return (
         <Table borderless>
             <thead>
@@ -394,6 +439,9 @@ function Header(props) {
                     <td className="empty header">12 PM</td>
                     {Array.from({ length: 7 }).map((_, index) => {
                         var num = props.date - day + index;
+                        if (num < 1) {
+                            num = 31 + (props.date - day + index);
+                        }
                         return <td key={index} className="header">
                             <h6>{num}</h6> {days[index]}
                         </td>
@@ -404,8 +452,10 @@ function Header(props) {
     )
 }
 
+// The whole week's calendar (table) component
 function Week(props) {
 
+    // Prebuilt React methods used to check if the weekly meetings changed
     const [meetings, setMeetings] = useState(weeklyMeetings);
 
     var interval;
@@ -425,6 +475,7 @@ function Week(props) {
         }, 1000);
     })
 
+    // return JSX again
     return (
         <div className="week" id="week">
             <div className="overlayTop" />
@@ -434,6 +485,7 @@ function Week(props) {
                 <Table bordered hover>
                     <tbody>
                         {Array.from({ length: 14 }).map((_, index) => {
+                            //Create each row with assigned time!
                             var num = index + 8;
                             var time = num;
 
@@ -458,11 +510,13 @@ function Week(props) {
                                     {(num)}
                                 </td>
                                 {Array.from({ length: 7 }).map((_, index) => {
+                                    // Create each hour!
                                     var num = props.date - day + index;
+                                    console.log(props.date);
 
                                     if (num == props.date)
-                                        return <td key={index} className="highlighted"><Hour date={num} hour={time} /></td>
-                                    return <td key={index}><Hour date={num} hour={time} /></td>
+                                        return <td key={index} className="highlighted"><Hour date={num} hour={time} realDate={props.date} /></td>
+                                    return <td key={index}><Hour date={num} hour={time} realDate={props.date} /></td>
                                 })}
                             </tr>
                         })}
@@ -475,6 +529,7 @@ function Week(props) {
     );
 }
 
+// an overlay that blurs webrtc meeting
 function Overlay(props) {
     const style = {
         display: "none",
@@ -489,8 +544,10 @@ function Overlay(props) {
 
 var mediaSettings = [true, true];
 
+// the webrtc meeting React component
 function Meeting(props) {
 
+    // woohoo more styles
     const style = {
         position: "absolute",
         display: "none",
@@ -501,6 +558,7 @@ function Meeting(props) {
         filter: "blur(10)"
     }
 
+    // omg! it's a return JSX!
     return <div style={style} className="hidden" id="video">
         <Overlay />
         <div id="meetingVideos" className="meetingVideos back" />
@@ -508,12 +566,15 @@ function Meeting(props) {
     </div>;
 }
 
+// basic meeting values for use outside components
 var inMeeting = false;
 var muted = false;
 var cameraOff = false;
 
+// The Call Buttons React Component
 function CallButtons(props) {
 
+    // style
     const style = {
         position: "relative",
         display: "flex",
@@ -524,6 +585,7 @@ function CallButtons(props) {
         zIndex: 20000000000000000000000000
     }
 
+    // send message through webrtc stating that a client has joined the meeting
     function joinCall(e) {
 
         if (!conn) {
@@ -553,10 +615,12 @@ function CallButtons(props) {
         button.className = "circleButton leave";
         document.getElementById("joinimg").src = end;
 
+        //fix init cam off
         toggleCam(e);
         toggleCam(e);
     }
 
+    // when client leaves the meeting
     function leaveCall(e) {
         inMeeting = false;
         console.log("leave");
@@ -574,6 +638,7 @@ function CallButtons(props) {
         document.getElementById("blurOver").style.display = "block";
     }
 
+    // turn on and off the microphone
     function toggleMute(e) {
         if (muted) {
             muted = false;
@@ -586,6 +651,7 @@ function CallButtons(props) {
         }
     }
 
+    //turn on and off the cam
     function toggleCam(e) {
         if (cameraOff) {
             cameraOff = false;
@@ -602,6 +668,7 @@ function CallButtons(props) {
         }
     }
 
+    // wowza! more JSX!
     return <div style={style}>
         <div className="circleButton join" onClick={joinCall} id="joinleave"> <img id="joinimg" src={call} /> </div>
         <div className="circleButton enabled" id="cam" onClick={toggleCam}> <img src={camera} /> </div>
@@ -609,6 +676,7 @@ function CallButtons(props) {
     </div>
 }
 
+// a login for the webrtc connection
 var name = "";
 function Login(props) {
 
@@ -626,6 +694,7 @@ function Login(props) {
             <InputGroup className="mb-3">
                 <FormControl id="name"
                     placeholder="Username"
+                    autocomplete="off"
                     onChange={(e) => {
                         name = e.target.value;
                     }}
@@ -640,6 +709,7 @@ function Login(props) {
     </div>);
 }
 
+// The component where the calendar meeting and UIs hang out
 function UI(props) {
 
     const [meeting, setMeeting] = useState(false);
@@ -683,7 +753,7 @@ function UI(props) {
         }
     }
 
-
+    // JSX return
     return (<div style={container}>
         <div style={style}>
             <h1 onClick={switchT} id="schedtitle" className="title selected">Schedule</h1>
@@ -713,6 +783,7 @@ render(
     document.getElementById("root")
 );
 
+// if mouse is moving while holding click or not
 var interval;
 var click = 0;
 
@@ -746,6 +817,7 @@ document.onmousemove = function (e) {
     }
 }
 
+// continuously get current date and time
 setInterval(() => {
 
     hour = new Date().getHours();
@@ -767,6 +839,7 @@ setInterval(() => {
 
 }, 100);
 
+// scroll to current time
 setTimeout(() => {
     var myElement = document.getElementById('scroll');
     var topPos = myElement.offsetTop - timeHeight;
@@ -784,6 +857,7 @@ setTimeout(() => {
 }, 1000);
 
 
+// WEBRTC STUFF
 function attemptConnection(e) {
     connect(name);
 }
@@ -803,14 +877,11 @@ function connect(_name) {
     }
 
     conn.onJoinCall = function (data) {
-        //console.log(data);
         createVid(data.user, conn.tracks[data.user]);
         if (!inMeeting) {
-            console.log("oh no");
+            console.log("oh no! you're missing out on the meeting!");
             document.getElementById("blurOver").style.display = "block";
         }
-        //console.log(conn.media);
-        //addText(data.user, data.message);
     }
 
     conn.onDisabledVideo = function (user) {
@@ -848,26 +919,36 @@ function connect(_name) {
     }
 }
 
-
+// Store, create, and remove streams of video and audio sent through webrtc
 var videos = {};
 function createVid(name, data) {
     document.getElementById("meetingVideos").className = "meetingVideos";
-    if (document.getElementById(name)) {
-        return;
-    }
-    var container = document.createElement('div');
-    container.id = name;
-    container.className = "videoBox";
 
-    var track = document.createElement('video');
-    track.srcObject = data;
-    track.autoplay = true;
-    if (!inMeeting || name == "localhost") {
-        track.muted = true;
+    var alreadyExists = false;
+    var keys = Object.keys(videos);
+    for (var i = 0; i < keys.length; i++) {
+        if (keys[i] == name) {
+            alreadyExists = true;
+        }
     }
-    videos[name] = track;
-    container.appendChild(track)
-    document.getElementById("meetingVideos").appendChild(container);
+
+    if (!alreadyExists) {
+        var container = document.createElement('div');
+        container.id = name;
+        container.className = "videoBox";
+
+        var track = document.createElement('video');
+        track.srcObject = data;
+        track.autoplay = true;
+        if (!inMeeting || name == "localhost") {
+            track.muted = true;
+        }
+        videos[name] = track;
+        container.appendChild(track)
+        document.getElementById("meetingVideos").appendChild(container);
+    } else {
+        console.log("That media stream video already exists!");
+    }
 }
 
 function removeVid(name) {
@@ -883,15 +964,3 @@ function removeVid(name) {
         document.getElementById("blurOver").style.display = "none";
     }
 }
-
-/*
-function createVid(name, data) {
-
-    var track = document.createElement('video');
-    track.id = name;
-    track.srcObject = data;
-    track.autoplay = true;
-    track.muted = true;
-    track.className = "blur";
-    document.getElementById("meetingVideos").appendChild(track);
-}*/
