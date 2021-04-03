@@ -33948,8 +33948,8 @@ __webpack_require__.r(__webpack_exports__);
  // create connection to desired wss 
 
 var server = new WebSocket("wss://blueserver.us.to:26950/");
-var initDate = new Date();
-initDate = new Date(2021, 11, 31); // find current date and time and save them
+var initDate = new Date(); //initDate = new Date(2021, 11, 31);
+// find current date and time and save them
 
 let [month, date, year] = initDate.toLocaleDateString("en-US").split("/"); //console.log(month);
 
