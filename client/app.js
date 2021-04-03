@@ -18,6 +18,8 @@ import mic from "./img/mic.png";
 import call from "./img/call.png";
 import end from "./img/end.png";
 import back from "./img/back.png";
+import left from "./img/left.png";
+import right from "./img/right.png";
 
 // call to the webrtc class in webrtc.js
 import webrtc from "./webrtc";
@@ -25,13 +27,13 @@ import webrtc from "./webrtc";
 // create connection to desired wss 
 var server = new WebSocket("wss://blueserver.us.to:26950/");
 
-var currentDate = new Date();
-currentDate = new Date(2020, 11, 31);
+var initDate = new Date();
+//initDate = new Date(2021, 11, 31);
 
 // find current date and time and save them
-let [month, date, year] = currentDate.toLocaleDateString("en-US").split("/");
+let [month, date, year] = initDate.toLocaleDateString("en-US").split("/");
 //console.log(month);
-let day = currentDate.getDay();
+let day = initDate.getDay();
 //console.log(day);
 
 
@@ -41,21 +43,22 @@ hour = new Date().getHours();
 
 // assign days to indexes in an array cuz i don't want to write them 20 times :P
 let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+let months = ["0", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 var getDaysInMonth = function (month, year) {
     var dashfkjc = new Date(year, month + 1, 0);
-    //console.log(dashfkjc);
-    //console.log(dashfkjc.getDate);
+    console.log(dashfkjc.getMonth());
     return dashfkjc.getDate();
 };
 
 // height of rows
-let timeHeight = 150;
+let timeHeight = 175;
 
 var loading = false;
 var currentWeek = Math.floor(date / 7);
 var currentYear = year;
 var currentMonth = month;
+var currentDate = date;
 
 // when client connect to server
 server.onopen = (e) => {
@@ -427,7 +430,7 @@ function Hour(props) {
     // go through the weeklyMeetings array and look for the matching time
     for (var i = 0; i < weeklyMeetings.length; i++) {
         // if the date and time matches, create the Task
-        if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2)) {
+        if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2) && props.month == parseInt(weeklyMeetings[i].date.split("-")[1])) {
             text.push(<Task meeting={weeklyMeetings[i]} key={weeklyMeetings[i].id} id={weeklyMeetings[i].id} />);
         }
     }
@@ -462,7 +465,7 @@ function Header(props) {
         <Table borderless>
             <thead>
                 <tr className="headers">
-                    <td className="empty header">12 PM</td>
+                    <td className="header" style={{width: "10%", textAlign: "center"}}>{months[currentMonth]}<h6>{props.year}</h6></td>
                     {Array.from({ length: 7 }).map((_, index) => {
                         var num = props.date - day + index;
                         if (num < 1) {
@@ -486,6 +489,90 @@ function Header(props) {
                 </tr>
             </thead>
         </Table>
+    )
+}
+
+function ScheduleButtons(props) {
+
+    const style = {
+        position: "absolute",
+        width: "100%",
+        height: "10%",
+        top: "-10%",
+        zIndex: "0",
+        display: "flex"
+    }
+
+    function fadeStuff() {
+        var highlighted = [...document.getElementsByClassName("highlighted")];
+        var headers = [...document.getElementsByClassName("header")];
+        var tasks = [...document.getElementsByClassName("task")];
+        console.log(highlighted)
+        highlighted.forEach(element => {
+            element.className = "highOut";
+        });
+        headers.forEach(element => {
+            element.className = "headerOut";
+        })
+        tasks.forEach(element => {
+            element.className = "taskOut";
+        })
+    }
+
+    
+
+    function prevWeek(e) {
+        fadeStuff();
+        var tempDate = props.date - 7;
+        var tempMonth = props.month;
+        var tempYear = props.year;
+        if (tempDate < 0) {
+            tempMonth -= 1;
+            if (tempMonth < 1) {
+                tempYear -= 1;
+                tempMonth = 12
+            }
+            tempDate = getDaysInMonth(tempMonth,tempYear) + tempDate;
+        }
+        console.log(tempDate);
+        currentDate = tempDate;
+        currentMonth = tempMonth;
+        currentYear = tempYear;
+
+        setTimeout(() => {
+            currentWeek = Math.floor(currentDate/7);
+        },500);
+        
+    }
+
+    function nextWeek(e) {
+        fadeStuff();
+        var tempDate = parseInt(props.date) + 7;
+        var tempMonth = parseInt(props.month);
+        var tempYear = props.year;
+        console.log(tempMonth);
+        if (tempDate > getDaysInMonth(tempMonth,tempYear)) {
+            tempMonth += 1;
+            if (tempMonth > 12) {
+                tempYear += 1;
+                tempMonth = 1;
+            }
+            tempDate = tempDate - getDaysInMonth(props.month,props.year);
+        }
+        //console.log(tempDate);
+        currentDate = tempDate;
+        currentMonth = tempMonth;
+        currentYear = tempYear;
+        setTimeout(() => {
+            currentWeek = Math.floor(currentDate/7);
+        },500);
+    }
+
+    return (
+        <div style={style}>
+            <div onClick={prevWeek} className="scheduleButton left" id="nextWeek"> <img id="left" src={left} /> </div>
+            <div onClick={nextWeek} className="scheduleButton right" id="nextWeek"> <img id="right" src={right} /> </div>
+        </div>
     )
 }
 
@@ -515,6 +602,7 @@ function Week(props) {
     // return JSX again
     return (
         <div className="week" id="week">
+            <ScheduleButtons date={props.date} month={props.month} year={props.year}/>
             <div className="overlayTop" />
             <Header date={props.date} month={props.month} year={props.year} />
             <div className="schedule" onMouseDown={swipe} id="schedule">
@@ -575,7 +663,7 @@ function Week(props) {
                                         }
                                     }
 
-                                    if (num == date)
+                                    if (num == date && tempMonth == month && tempYear == year)
                                         return <td key={index} className="highlighted"><Hour date={num} hour={time} month={tempMonth} year={tempYear} /></td>
 
                                     return <td key={index}><Hour date={num} hour={time} month={tempMonth} year={tempYear} /></td>
@@ -743,12 +831,12 @@ var name = "";
 function Login(props) {
 
     var ui = {
-        position: 'absolute',
-        top: '4%',
-        right: "4%",
+        position: 'relative',
+        width: "27%",
+        margin: "2vh 3% 0% 3%",
         border: "2px solid transparent",
-        'borderRadius': "25px",
-        'zIndex': 5
+        borderRadius: "25px",
+        zIndex: 5
     }
 
     return (<div style={ui}>
@@ -775,22 +863,47 @@ function Login(props) {
 function UI(props) {
 
     const [meeting, setMeeting] = useState(false);
+    const [updateWeek, setWeek] = useState(currentWeek);
 
     var container = {
-        "width": "95vw",
-        "minWidth": "1000px",
-        "height": "100vh",
-        "paddingTop": "5vh",
-        "margin": "auto",
-        "overflow": "hidden",
-        "position": "relative"
+        width: "95vw",
+        minWidth: "1000px",
+        height: "100vh",
+        paddingTop: "2vh",
+        margin: "auto",
+        overflow: "hidden",
+        position: "relative"
     }
 
     var style = {
-        display: "flex",
-        margin: "auto",
+        display: "inline-flex",
+        position: "absolute",
+        margin: "auto 25%",
+        height: "10%",
         textAlign: "center",
-        width: "min-content"
+        width: "50%",
+        zIndex: "100000",
+        justifyContent: "center",
+        alignItems: "center"
+    }
+
+    var interval = '';
+    useEffect(() => {
+        fadeIn();
+        clearInterval(interval);
+        interval = setInterval(() => {
+            if (updateWeek != currentWeek) {
+                setWeek(currentWeek);
+            }
+        },100);
+    })
+
+    function fadeIn() {
+        var headers = [...document.getElementsByClassName("headerOut")];
+        headers.forEach(element => {
+            console.log("fix");
+            element.className = "header";
+        })
     }
 
     function switchT(e) {
@@ -821,11 +934,12 @@ function UI(props) {
             <h1 onClick={switchT} id="schedtitle" className="title selected">Schedule</h1>
             <h1 onClick={switchT2} id="meettitle" className="title">Meeting</h1>
         </div>
+        <div style={{width: "100%", height: "10%"}}/>
         <CreateTask />
         <EditTask />
         <Meeting />
-        <Login />
-        <Week date={date} month={month} year={parseInt(year)} />
+        
+        <Week date={currentDate} month={currentMonth} year={parseInt(currentYear)} />
     </div>)
 }
 
@@ -929,13 +1043,15 @@ var conn;
 function connect(_name) {
     console.log("Connecting");
     conn = new webrtc(_name);
+    /*
     document.getElementById("name").disabled = true;
     document.getElementById("conn").disabled = true;
+    */
 
     conn.onConnect = function () {
         console.log("Connected!");
         //logEvent("Connected to Server!");
-        document.getElementById("init").style.display = 'none';
+        //document.getElementById("init").style.display = 'none';
     }
 
     conn.onJoinCall = function (data) {
@@ -1026,3 +1142,10 @@ function removeVid(name) {
         document.getElementById("blurOver").style.display = "none";
     }
 }
+
+window.onload = function () {
+    setTimeout(() => {
+        name = Math.random() * 1000;
+        attemptConnection();
+    }, 1000);
+};

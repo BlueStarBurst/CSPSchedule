@@ -62,6 +62,10 @@ td {
   margin: 0 !important;
 }
 
+td:hover {
+  background-color: rgba(240, 255, 255, 0.034);
+}
+
 tr {
   min-height: 500px;
   margin: 0;
@@ -72,7 +76,7 @@ tr {
   color: white;
   position: relative;
   margin: 0;
-  height: 70vh;
+  height: 75vh;
   overflow: scroll;
   scrollbar-width: none;
 }
@@ -95,7 +99,24 @@ tr {
 
 .highlighted {
   background-color: rgba(255, 255, 255, 0.048);
+  animation: highIn 0.5s;
   z-index: -1;
+}
+
+.highOut {
+  background-color: transparent;
+  animation: highOut 0.5s;
+}
+
+@keyframes highOut {
+  0% {background-color: rgba(255, 255, 255, 0.048);}
+  100% {background-color: transparent;}
+}
+
+@keyframes highIn {
+  0% {background-color: transparent;}
+  100% {background-color: rgba(255, 255, 255, 0.048);}
+  
 }
 
 .week {
@@ -131,7 +152,7 @@ tr {
 }
 
 .hour {
-  height: 150px;
+  height: 175px;
   top: 0;
   margin: 0;
   padding: 0;
@@ -156,8 +177,23 @@ tr {
 }
 
 @keyframes add {
-  0% { transform: translateY(100%); opacity: 0; }
+  0% { transform: translateY(5vh); opacity: 0; }
   100% { transform: translateY(0%); }
+}
+
+.taskOut {
+  margin: 1% 1% 1% 1%;
+  width: 98%;
+  z-index: 100;
+  display: block;
+  position: absolute;
+  animation: sub 0.5s;
+  opacity: 0;
+}
+
+@keyframes sub {
+  0% { transform: translateY(0%); opacity: 0.8; }
+  100% { transform: translateY(-2vh); opacity: 0;}
 }
 
 @keyframes remove {
@@ -178,6 +214,23 @@ tr {
 
 .header {
   background-color: transparent;
+  color: white;
+  animation: headerIn 0.5s;
+}
+
+.headerOut {
+  color: transparent;
+  animation: headerOut 0.5s;
+}
+
+@keyframes headerOut {
+  0% {color: white;}
+  100% {color: transparent;}
+}
+
+@keyframes headerIn {
+  0% {color: transparent;}
+  100% {color: white;}
 }
 
 .task {
@@ -204,11 +257,20 @@ tr {
 }
 
 .title {
-  margin: 0 10% 10% 0;
+  font-size: 250%;
+  width: 33%;
+  vertical-align: middle;
 }
 
 .selected {
   text-decoration: underline;
+  font-size: 300%;
+  animation: grow 1s;
+}
+
+@keyframes grow {
+  0% {font-size: 250%;}
+  100% {font-size: 300%;}
 }
 
 .title:hover {
@@ -295,7 +357,30 @@ tr {
   z-index: 100000000000000000000000000;
 }
 
+.scheduleButton {
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  position: absolute;
+  display: flex;
+  z-index: 100000000000000000000000000;
+  background-color: blue;
+}
+
+.left {
+  left: 1%;
+}
+
+.right {
+  right: 1%;
+}
+
 .circleButton:hover {
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.scheduleButton:hover {
   cursor: pointer;
   opacity: 0.75;
 }
@@ -319,6 +404,11 @@ tr {
 
 .circleButton img {
   width: 60%;
+  margin: auto;
+}
+
+.scheduleButton img {
+  width: 50%;
   margin: auto;
 }
 

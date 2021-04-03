@@ -114,27 +114,26 @@ function findWeek(year, month, week) {
   month = parseInt(month);
   week = parseInt(week);
 
-  if (week == 0) {
-    var lastweek = 0;
-    var tempMonth = month - 1;
-    var tempYear = year;
+  var lastweek = 0;
+  var tempMonth = month - 1;
+  var tempYear = year;
 
-    if (tempMonth < 1) {
-      tempMonth = 12;
-      tempYear = year - 1;
-    }
-
-    initSchedule(tempYear, tempMonth, lastweek);
-    Object.keys(schedule[tempYear][tempMonth]).forEach(element => {
-      if (element > lastweek) {
-        lastweek = element;
-      }
-    });
-    arr = arr.concat(addToWeeks(tempYear, tempMonth, lastweek));
-    currentYears.push(tempYear);
-    currentMonths.push(tempMonth);
-    currentWeeks.push(lastweek);
+  if (tempMonth < 1) {
+    tempMonth = 12;
+    tempYear = year - 1;
   }
+
+  initSchedule(tempYear, tempMonth, lastweek);
+  Object.keys(schedule[tempYear][tempMonth]).forEach(element => {
+    if (element > lastweek) {
+      lastweek = element;
+    }
+  });
+  arr = arr.concat(addToWeeks(tempYear, tempMonth, lastweek));
+  currentYears.push(tempYear);
+  currentMonths.push(tempMonth);
+  currentWeeks.push(lastweek);
+
   arr = arr.concat(addToWeeks(year, month, week));
   currentYears.push(year);
   currentMonths.push(month);
@@ -147,6 +146,18 @@ function findWeek(year, month, week) {
     tempYear = year + 1;
     tempMonth = 1;
   }
+
+  initSchedule(year, month, week-1);
+  arr = arr.concat(addToWeeks(year, month, week-1));
+  currentYears.push(year);
+  currentMonths.push(month);
+  currentWeeks.push(week-1);
+
+  initSchedule(year, month, week+1);
+  arr = arr.concat(addToWeeks(year, month, week+1));
+  currentYears.push(year);
+  currentMonths.push(month);
+  currentWeeks.push(week+1);
 
   initSchedule(tempYear, tempMonth, 0);
   arr = arr.concat(addToWeeks(tempYear, tempMonth, 0));

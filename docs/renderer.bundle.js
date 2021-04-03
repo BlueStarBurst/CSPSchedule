@@ -538,7 +538,7 @@ var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBP
 var ___CSS_LOADER_URL_REPLACEMENT_0___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(_img_novideo_png__WEBPACK_IMPORTED_MODULE_3__.default);
 var ___CSS_LOADER_URL_REPLACEMENT_1___ = _node_modules_css_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_2___default()(_img_back_png__WEBPACK_IMPORTED_MODULE_4__.default);
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "/* all the styles defined by classnames or object types */\r\n\r\n::root {\r\n  --blue: blue;\r\n}\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ");\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"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","sourcesContent":["/* all the styles defined by classnames or object types */\r\n\r\n::root {\r\n  --blue: blue;\r\n}\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 70vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  z-index: -1;\r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 150px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(100%); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  margin: 0 10% 10% 0;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(img/novideo.png);\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(img/back.png);\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}"],"sourceRoot":""}]);
+___CSS_LOADER_EXPORT___.push([module.id, "/* all the styles defined by classnames or object types */\r\n\r\n::root {\r\n  --blue: blue;\r\n}\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntd:hover {\r\n  background-color: rgba(240, 255, 255, 0.034);\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 75vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  animation: highIn 0.5s;\r\n  z-index: -1;\r\n}\r\n\r\n.highOut {\r\n  background-color: transparent;\r\n  animation: highOut 0.5s;\r\n}\r\n\r\n@keyframes highOut {\r\n  0% {background-color: rgba(255, 255, 255, 0.048);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n@keyframes highIn {\r\n  0% {background-color: transparent;}\r\n  100% {background-color: rgba(255, 255, 255, 0.048);}\r\n  \r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 175px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(5vh); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n.taskOut {\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: sub 0.5s;\r\n  opacity: 0;\r\n}\r\n\r\n@keyframes sub {\r\n  0% { transform: translateY(0%); opacity: 0.8; }\r\n  100% { transform: translateY(-2vh); opacity: 0;}\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n  color: white;\r\n  animation: headerIn 0.5s;\r\n}\r\n\r\n.headerOut {\r\n  color: transparent;\r\n  animation: headerOut 0.5s;\r\n}\r\n\r\n@keyframes headerOut {\r\n  0% {color: white;}\r\n  100% {color: transparent;}\r\n}\r\n\r\n@keyframes headerIn {\r\n  0% {color: transparent;}\r\n  100% {color: white;}\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  font-size: 250%;\r\n  width: 33%;\r\n  vertical-align: middle;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n  font-size: 300%;\r\n  animation: grow 1s;\r\n}\r\n\r\n@keyframes grow {\r\n  0% {font-size: 250%;}\r\n  100% {font-size: 300%;}\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.scheduleButton {\r\n  width: 50px;\r\n  height: 50px;\r\n  border-radius: 100%;\r\n  position: absolute;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n  background-color: blue;\r\n}\r\n\r\n.left {\r\n  left: 1%;\r\n}\r\n\r\n.right {\r\n  right: 1%;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.scheduleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\n.scheduleButton img {\r\n  width: 50%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_0___ + ");\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(" + ___CSS_LOADER_URL_REPLACEMENT_1___ + ");\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}", "",{"version":3,"sources":["webpack://./client/style.css"],"names":[],"mappings":"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","sourcesContent":["/* all the styles defined by classnames or object types */\r\n\r\n::root {\r\n  --blue: blue;\r\n}\r\n\r\nhtml {\r\n  scroll-behavior: smooth;\r\n  overflow: auto;\r\n  background-color: rgba(10,10,10,255)\r\n}\r\n\r\n.unselectable {\r\n  -webkit-user-select: none;\r\n  -moz-user-select: none;\r\n  -ms-user-select: none;\r\n  user-select: none;\r\n}\r\n\r\n* {\r\n  user-select: none;\r\n  -khtml-user-select: none;\r\n  -o-user-select: none;\r\n  -moz-user-select: -moz-none;\r\n  -webkit-user-select: none;\r\n}\r\n\r\n::selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n::-moz-selection {\r\n  background: transparent;\r\n  color: inherit;\r\n}\r\n\r\n\r\n\r\n.times {\r\n  color: white;\r\n  width: 10%;\r\n  text-align: center;\r\n}\r\n\r\n\r\n\r\ntable {\r\n  table-layout: fixed;\r\n  margin: 0;\r\n  padding: 0;\r\n  border-color: transparent;\r\n  border-collapse: collapse;\r\n  border-spacing: 0;\r\n  top: 0;\r\n  z-index: -1;\r\n}\r\n\r\ntd {\r\n  border-color: rgb(94, 94, 94) !important;\r\n  color: white;\r\n  padding: 0 !important;\r\n  margin: 0 !important;\r\n}\r\n\r\ntd:hover {\r\n  background-color: rgba(240, 255, 255, 0.034);\r\n}\r\n\r\ntr {\r\n  min-height: 500px;\r\n  margin: 0;\r\n  padding: 0;\r\n}\r\n\r\n.schedule {\r\n  color: white;\r\n  position: relative;\r\n  margin: 0;\r\n  height: 75vh;\r\n  overflow: scroll;\r\n  scrollbar-width: none;\r\n}\r\n\r\n.schedule::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.task::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.removed::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.meetingVideos::-webkit-scrollbar {\r\n  display: none;\r\n}\r\n\r\n.highlighted {\r\n  background-color: rgba(255, 255, 255, 0.048);\r\n  animation: highIn 0.5s;\r\n  z-index: -1;\r\n}\r\n\r\n.highOut {\r\n  background-color: transparent;\r\n  animation: highOut 0.5s;\r\n}\r\n\r\n@keyframes highOut {\r\n  0% {background-color: rgba(255, 255, 255, 0.048);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n@keyframes highIn {\r\n  0% {background-color: transparent;}\r\n  100% {background-color: rgba(255, 255, 255, 0.048);}\r\n  \r\n}\r\n\r\n.week {\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.overlayTop {\r\n  top: 10%;\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 90.5%;\r\n  background: linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(20, 20, 20,1) 10%, rgba(20, 20, 20,1) 90%, rgba(0,0,0,0.5) 100%);\r\n  pointer-events:none;\r\n}\r\n\r\n.head {\r\n  margin: 0;\r\n  height: min-content;\r\n}\r\n\r\n.empty {\r\n  color: transparent;\r\n  border-color: transparent;\r\n  border-bottom: 3px transparent solid;\r\n  width: 10%;\r\n}\r\n\r\n.headers {\r\n  border-bottom: 3px white solid;\r\n  background-color: transparent;\r\n}\r\n\r\n.hour {\r\n  height: 175px;\r\n  top: 0;\r\n  margin: 0;\r\n  padding: 0;\r\n  position: relative;\r\n}\r\n\r\n.currentTime {\r\n  position: absolute;\r\n  width: 100%;\r\n  height: 3px;\r\n  background-color: rgba(255, 0, 0, 0.5);\r\n  opacity: 0;\r\n}\r\n\r\n.currentTimeAnim {\r\n  animation: slideDown 2s ease-out;\r\n}\r\n\r\n@keyframes slideDown {\r\n  0% { transform: translateY(-100vh); opacity: 0;}\r\n  100% { transform: translateY(0%); opacity: 1; }\r\n}\r\n\r\n@keyframes add {\r\n  0% { transform: translateY(5vh); opacity: 0; }\r\n  100% { transform: translateY(0%); }\r\n}\r\n\r\n.taskOut {\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: sub 0.5s;\r\n  opacity: 0;\r\n}\r\n\r\n@keyframes sub {\r\n  0% { transform: translateY(0%); opacity: 0.8; }\r\n  100% { transform: translateY(-2vh); opacity: 0;}\r\n}\r\n\r\n@keyframes remove {\r\n  0% { transform: translateY(0%); opacity: 1; }\r\n  100% { transform: translateY(100%); opacity: 0;}\r\n}\r\n\r\n.removed {\r\n  animation: remove 2s;\r\n  opacity: 0;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.header {\r\n  background-color: transparent;\r\n  color: white;\r\n  animation: headerIn 0.5s;\r\n}\r\n\r\n.headerOut {\r\n  color: transparent;\r\n  animation: headerOut 0.5s;\r\n}\r\n\r\n@keyframes headerOut {\r\n  0% {color: white;}\r\n  100% {color: transparent;}\r\n}\r\n\r\n@keyframes headerIn {\r\n  0% {color: transparent;}\r\n  100% {color: white;}\r\n}\r\n\r\n.task {\r\n  opacity: 0.8;\r\n  margin: 1% 1% 1% 1%;\r\n  width: 98%;\r\n  z-index: 100;\r\n  display: block;\r\n  position: absolute;\r\n  animation: add 2s;\r\n}\r\n\r\n.task:hover {\r\n  cursor: pointer;\r\n  opacity: 1;\r\n}\r\n\r\n.half {\r\n  position: absolute;\r\n  top: 50%;\r\n  height: 1px;\r\n  width: 100%;\r\n  border-bottom: 1px rgb(48, 48, 48) dashed;\r\n}\r\n\r\n.title {\r\n  font-size: 250%;\r\n  width: 33%;\r\n  vertical-align: middle;\r\n}\r\n\r\n.selected {\r\n  text-decoration: underline;\r\n  font-size: 300%;\r\n  animation: grow 1s;\r\n}\r\n\r\n@keyframes grow {\r\n  0% {font-size: 250%;}\r\n  100% {font-size: 300%;}\r\n}\r\n\r\n.title:hover {\r\n  cursor: pointer;\r\n}\r\n\r\n.slideOutRight {\r\n  animation: slideOutRight 1s;\r\n  transform: translateX(-100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideOutLeft {\r\n  animation: slideOutLeft 1s;\r\n  transform: translateX(100vw);\r\n  opacity: 0;\r\n}\r\n\r\n.slideInRight {\r\n  animation: slideInRight 1s;\r\n  opacity: 1;\r\n}\r\n\r\n.slideInLeft {\r\n  animation: slideInLeft 1s;\r\n  opacity: 1;\r\n}\r\n\r\n@keyframes slideOutRight {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideOutLeft {\r\n  0% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n  100% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n}\r\n\r\n@keyframes slideInRight {\r\n  0% {\r\n    transform: translateX(100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n@keyframes slideInLeft {\r\n  0% {\r\n    transform: translateX(-100vw);\r\n    opacity: 0;\r\n  }\r\n  100% {\r\n    transform: translateX(0%);\r\n    opacity: 1;\r\n  }\r\n}\r\n\r\n.hidden {\r\n  opacity: 0;\r\n}\r\n\r\n.circleButton {\r\n  width: 75px;\r\n  height: 75px;\r\n  border-radius: 100%;\r\n  margin: auto;\r\n  position: relative;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n}\r\n\r\n.scheduleButton {\r\n  width: 50px;\r\n  height: 50px;\r\n  border-radius: 100%;\r\n  position: absolute;\r\n  display: flex;\r\n  z-index: 100000000000000000000000000;\r\n  background-color: blue;\r\n}\r\n\r\n.left {\r\n  left: 1%;\r\n}\r\n\r\n.right {\r\n  right: 1%;\r\n}\r\n\r\n.circleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.scheduleButton:hover {\r\n  cursor: pointer;\r\n  opacity: 0.75;\r\n}\r\n\r\n.join {\r\n  background-color: rgb(42, 202, 42);\r\n}\r\n\r\n.leave {\r\n  background-color: red;\r\n}\r\n\r\n.disabled {\r\n  background-color: red;\r\n}\r\n\r\n.enabled {\r\n  background-color: rgb(146, 146, 146);\r\n  opacity: 1;\r\n}\r\n\r\n.circleButton img {\r\n  width: 60%;\r\n  margin: auto;\r\n}\r\n\r\n.scheduleButton img {\r\n  width: 50%;\r\n  margin: auto;\r\n}\r\n\r\nvideo {\r\n  position: relative;\r\n  z-index: 1000;\r\n  width: 100%;\r\n  margin: auto;\r\n  object-fit: cover;\r\n  object-position: center;\r\n  flex-shrink: 2;\r\n  \r\n}\r\n\r\n.videoBox {\r\n  width: auto;\r\n  height: auto;\r\n  flex-shrink: 2;\r\n  flex-grow: 1;\r\n  flex-basis: 100px;\r\n  min-width: 33%;\r\n  max-width: 60%;\r\n  margin: auto;\r\n  background-image: url(img/novideo.png);\r\n  background-size: contain;\r\n  background-color: rgba(128, 128, 128, 0.096);\r\n  \r\n}\r\n\r\n.meetingVideos {\r\n  display: flex;\r\n  flex-wrap: wrap;\r\n  position: relative;\r\n  overflow: auto;\r\n  width: 100%;\r\n  height: 90%;\r\n  filter: blur(1000);\r\n  \r\n  animation: fadeEffect 3s infinite;\r\n  border-radius: 25px;\r\n}\r\n\r\n.blur {\r\n  filter: blur(100);\r\n}\r\n\r\n@keyframes fadeEffect {\r\n  0% {background-color: transparent;}\r\n  50% {background-color: rgba(128, 128, 128, 0.021);}\r\n  100% {background-color: transparent;}\r\n}\r\n\r\n.back {\r\n  background-image: url(img/back.png);\r\n  background-position: center;\r\n  background-size: contain;\r\n  background-repeat: no-repeat;\r\n}"],"sourceRoot":""}]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -814,6 +814,21 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
+/***/ "./client/img/left.png":
+/*!*****************************!*\
+  !*** ./client/img/left.png ***!
+  \*****************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "client/img/left.png");
+
+/***/ }),
+
 /***/ "./client/img/mic.png":
 /*!****************************!*\
   !*** ./client/img/mic.png ***!
@@ -841,6 +856,21 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "client/img/novideo.png");
+
+/***/ }),
+
+/***/ "./client/img/right.png":
+/*!******************************!*\
+  !*** ./client/img/right.png ***!
+  \******************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (__webpack_require__.p + "client/img/right.png");
 
 /***/ }),
 
@@ -33880,11 +33910,11 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react_dom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-dom */ "./node_modules/react-dom/index.js");
-/* harmony import */ var react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react-bootstrap/Table */ "./node_modules/react-bootstrap/esm/Table.js");
-/* harmony import */ var react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react-bootstrap/InputGroup */ "./node_modules/react-bootstrap/esm/InputGroup.js");
-/* harmony import */ var react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-bootstrap/FormControl */ "./node_modules/react-bootstrap/esm/FormControl.js");
-/* harmony import */ var react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! react-bootstrap/Button */ "./node_modules/react-bootstrap/esm/Button.js");
-/* harmony import */ var react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! react-bootstrap/Form */ "./node_modules/react-bootstrap/esm/Form.js");
+/* harmony import */ var react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! react-bootstrap/Table */ "./node_modules/react-bootstrap/esm/Table.js");
+/* harmony import */ var react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! react-bootstrap/InputGroup */ "./node_modules/react-bootstrap/esm/InputGroup.js");
+/* harmony import */ var react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! react-bootstrap/FormControl */ "./node_modules/react-bootstrap/esm/FormControl.js");
+/* harmony import */ var react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! react-bootstrap/Button */ "./node_modules/react-bootstrap/esm/Button.js");
+/* harmony import */ var react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! react-bootstrap/Form */ "./node_modules/react-bootstrap/esm/Form.js");
 /* harmony import */ var _style_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./style.css */ "./client/style.css");
 /* harmony import */ var bootstrap_dist_css_bootstrap_min_css__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! bootstrap/dist/css/bootstrap.min.css */ "./node_modules/bootstrap/dist/css/bootstrap.min.css");
 /* harmony import */ var _img_camera_png__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./img/camera.png */ "./client/img/camera.png");
@@ -33892,8 +33922,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _img_call_png__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./img/call.png */ "./client/img/call.png");
 /* harmony import */ var _img_end_png__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./img/end.png */ "./client/img/end.png");
 /* harmony import */ var _img_back_png__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./img/back.png */ "./client/img/back.png");
-/* harmony import */ var _webrtc__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./webrtc */ "./client/webrtc.js");
+/* harmony import */ var _img_left_png__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./img/left.png */ "./client/img/left.png");
+/* harmony import */ var _img_right_png__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./img/right.png */ "./client/img/right.png");
+/* harmony import */ var _webrtc__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./webrtc */ "./client/webrtc.js");
 //lots of imports
+
+
 
 
 
@@ -33914,31 +33948,32 @@ __webpack_require__.r(__webpack_exports__);
  // create connection to desired wss 
 
 var server = new WebSocket("wss://blueserver.us.to:26950/");
-var currentDate = new Date();
-currentDate = new Date(2020, 11, 31); // find current date and time and save them
+var initDate = new Date();
+initDate = new Date(2021, 11, 31); // find current date and time and save them
 
-let [month, date, year] = currentDate.toLocaleDateString("en-US").split("/"); //console.log(month);
+let [month, date, year] = initDate.toLocaleDateString("en-US").split("/"); //console.log(month);
 
-let day = currentDate.getDay(); //console.log(day);
+let day = initDate.getDay(); //console.log(day);
 
 let [hour, minute, second] = new Date().toLocaleTimeString("en-US").split(/:| /);
 hour = new Date().getHours(); // assign days to indexes in an array cuz i don't want to write them 20 times :P
 
 let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+let months = ["0", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
 var getDaysInMonth = function (month, year) {
-  var dashfkjc = new Date(year, month + 1, 0); //console.log(dashfkjc);
-  //console.log(dashfkjc.getDate);
-
+  var dashfkjc = new Date(year, month + 1, 0);
+  console.log(dashfkjc.getMonth());
   return dashfkjc.getDate();
 }; // height of rows
 
 
-let timeHeight = 150;
+let timeHeight = 175;
 var loading = false;
 var currentWeek = Math.floor(date / 7);
 var currentYear = year;
-var currentMonth = month; // when client connect to server
+var currentMonth = month;
+var currentDate = date; // when client connect to server
 
 server.onopen = e => {
   // get current schedule on server
@@ -34065,32 +34100,32 @@ function CreateTask(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: style,
     id: "form"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default, {
     onSubmit: createServerTask,
     autoComplete: "off"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     type: "text",
     id: "createSubject",
     placeholder: "Class"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     type: "textarea",
     id: "createTitle",
     placeholder: "Brief Overview"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     type: "date",
     id: "createDate"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     type: "time",
     id: "createTime"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     as: "select",
     id: "createLength"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
@@ -34109,15 +34144,15 @@ function CreateTask(props) {
     value: "105"
   }, "01:45"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
     value: "120"
-  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
+  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, {
     style: {
       color: "transparent"
     }
-  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__.default, {
+  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_13__.default, {
     type: "submit"
   }, "Submit form"))))));
 } // ready selected meeting global variable
@@ -34201,31 +34236,31 @@ function EditTask(props) {
       textAlign: "center",
       margin: "auto"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default, {
     autoComplete: "off"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     type: "text",
     id: "editSubject",
     placeholder: "Class"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Title"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     type: "textarea",
     id: "editTitle",
     placeholder: "Brief Overview"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Date"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     type: "date",
     id: "editDate"
-  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
+  })), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Time"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     type: "time",
     id: "editTime"
-  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
+  }))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, null, "Length"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Control, {
     as: "select",
     id: "editLength"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
@@ -34244,26 +34279,26 @@ function EditTask(props) {
     value: "105"
   }, "01:45"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("option", {
     value: "120"
-  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
+  }, "02:00"))), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, {
     style: {
       color: "transparent"
     }
-  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__.default, {
+  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_13__.default, {
     onClick: editServerTask,
     variant: "warning"
-  }, "Update changes")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, {
+  }, "Update changes")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Group, {
     style: {
       marginLeft: "2%"
     }
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_12__.default.Label, {
     style: {
       color: "transparent"
     }
-  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__.default, {
+  }, " uwu "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_13__.default, {
     onClick: removeServerTask,
     variant: "danger"
   }, "Remove meeting"))))));
@@ -34320,7 +34355,7 @@ function Hour(props) {
 
   for (var i = 0; i < weeklyMeetings.length; i++) {
     // if the date and time matches, create the Task
-    if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2)) {
+    if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2) && props.month == parseInt(weeklyMeetings[i].date.split("-")[1])) {
       text.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Task, {
         meeting: weeklyMeetings[i],
         key: weeklyMeetings[i].id,
@@ -34356,13 +34391,17 @@ function Hour(props) {
 
 function Header(props) {
   //console.log(props.date)
-  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_12__.default, {
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_14__.default, {
     borderless: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", {
     className: "headers"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
-    className: "empty header"
-  }, "12 PM"), Array.from({
+    className: "header",
+    style: {
+      width: "10%",
+      textAlign: "center"
+    }
+  }, months[currentMonth], /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h6", null, props.year)), Array.from({
     length: 7
   }).map((_, index) => {
     var num = props.date - day + index;
@@ -34386,6 +34425,104 @@ function Header(props) {
       className: "header"
     }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h6", null, num), " ", days[index]);
   }))));
+}
+
+function ScheduleButtons(props) {
+  const style = {
+    position: "absolute",
+    width: "100%",
+    height: "10%",
+    top: "-10%",
+    zIndex: "0",
+    display: "flex"
+  };
+
+  function fadeStuff() {
+    var highlighted = [...document.getElementsByClassName("highlighted")];
+    var headers = [...document.getElementsByClassName("header")];
+    var tasks = [...document.getElementsByClassName("task")];
+    console.log(highlighted);
+    highlighted.forEach(element => {
+      element.className = "highOut";
+    });
+    headers.forEach(element => {
+      element.className = "headerOut";
+    });
+    tasks.forEach(element => {
+      element.className = "taskOut";
+    });
+  }
+
+  function prevWeek(e) {
+    fadeStuff();
+    var tempDate = props.date - 7;
+    var tempMonth = props.month;
+    var tempYear = props.year;
+
+    if (tempDate < 0) {
+      tempMonth -= 1;
+
+      if (tempMonth < 1) {
+        tempYear -= 1;
+        tempMonth = 12;
+      }
+
+      tempDate = getDaysInMonth(tempMonth, tempYear) + tempDate;
+    }
+
+    console.log(tempDate);
+    currentDate = tempDate;
+    currentMonth = tempMonth;
+    currentYear = tempYear;
+    setTimeout(() => {
+      currentWeek = Math.floor(currentDate / 7);
+    }, 500);
+  }
+
+  function nextWeek(e) {
+    fadeStuff();
+    var tempDate = parseInt(props.date) + 7;
+    var tempMonth = parseInt(props.month);
+    var tempYear = props.year;
+    console.log(tempMonth);
+
+    if (tempDate > getDaysInMonth(tempMonth, tempYear)) {
+      tempMonth += 1;
+
+      if (tempMonth > 12) {
+        tempYear += 1;
+        tempMonth = 1;
+      }
+
+      tempDate = tempDate - getDaysInMonth(props.month, props.year);
+    } //console.log(tempDate);
+
+
+    currentDate = tempDate;
+    currentMonth = tempMonth;
+    currentYear = tempYear;
+    setTimeout(() => {
+      currentWeek = Math.floor(currentDate / 7);
+    }, 500);
+  }
+
+  return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    style: style
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    onClick: prevWeek,
+    className: "scheduleButton left",
+    id: "nextWeek"
+  }, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
+    id: "left",
+    src: _img_left_png__WEBPACK_IMPORTED_MODULE_9__.default
+  }), " "), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    onClick: nextWeek,
+    className: "scheduleButton right",
+    id: "nextWeek"
+  }, " ", /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("img", {
+    id: "right",
+    src: _img_right_png__WEBPACK_IMPORTED_MODULE_10__.default
+  }), " "));
 } // The whole week's calendar (table) component
 
 
@@ -34412,7 +34549,11 @@ function Week(props) {
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "week",
     id: "week"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(ScheduleButtons, {
+    date: props.date,
+    month: props.month,
+    year: props.year
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "overlayTop"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Header, {
     date: props.date,
@@ -34425,7 +34566,7 @@ function Week(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     id: "currentTime",
     className: "currentTime"
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_12__.default, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_14__.default, {
     bordered: true,
     hover: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("tbody", null, Array.from({
@@ -34488,7 +34629,7 @@ function Week(props) {
         }
       }
 
-      if (num == date) return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
+      if (num == date && tempMonth == month && tempYear == year) return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
         key: index,
         className: "highlighted"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Hour, {
@@ -34668,20 +34809,20 @@ var name = "";
 
 function Login(props) {
   var ui = {
-    position: 'absolute',
-    top: '4%',
-    right: "4%",
+    position: 'relative',
+    width: "27%",
+    margin: "2vh 3% 0% 3%",
     border: "2px solid transparent",
-    'borderRadius': "25px",
-    'zIndex': 5
+    borderRadius: "25px",
+    zIndex: 5
   };
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     style: ui
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     id: "init"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_13__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_15__.default, {
     className: "mb-3"
-  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_14__.default, {
+  }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_16__.default, {
     id: "name",
     placeholder: "Username",
     autoComplete: "off",
@@ -34690,7 +34831,7 @@ function Login(props) {
     },
     "aria-label": "Username",
     "aria-describedby": "basic-addon2"
-  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_13__.default.Append, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_11__.default, {
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_InputGroup__WEBPACK_IMPORTED_MODULE_15__.default.Append, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Button__WEBPACK_IMPORTED_MODULE_13__.default, {
     onClick: attemptConnection,
     id: "conn",
     variant: "outline-secondary"
@@ -34700,21 +34841,45 @@ function Login(props) {
 
 function UI(props) {
   const [meeting, setMeeting] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(false);
+  const [updateWeek, setWeek] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(currentWeek);
   var container = {
-    "width": "95vw",
-    "minWidth": "1000px",
-    "height": "100vh",
-    "paddingTop": "5vh",
-    "margin": "auto",
-    "overflow": "hidden",
-    "position": "relative"
+    width: "95vw",
+    minWidth: "1000px",
+    height: "100vh",
+    paddingTop: "2vh",
+    margin: "auto",
+    overflow: "hidden",
+    position: "relative"
   };
   var style = {
-    display: "flex",
-    margin: "auto",
+    display: "inline-flex",
+    position: "absolute",
+    margin: "auto 25%",
+    height: "10%",
     textAlign: "center",
-    width: "min-content"
+    width: "50%",
+    zIndex: "100000",
+    justifyContent: "center",
+    alignItems: "center"
   };
+  var interval = '';
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    fadeIn();
+    clearInterval(interval);
+    interval = setInterval(() => {
+      if (updateWeek != currentWeek) {
+        setWeek(currentWeek);
+      }
+    }, 100);
+  });
+
+  function fadeIn() {
+    var headers = [...document.getElementsByClassName("headerOut")];
+    headers.forEach(element => {
+      console.log("fix");
+      element.className = "header";
+    });
+  }
 
   function switchT(e) {
     if (meeting) {
@@ -34751,10 +34916,15 @@ function UI(props) {
     onClick: switchT2,
     id: "meettitle",
     className: "title"
-  }, "Meeting")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(CreateTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(EditTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Meeting, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Login, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Week, {
-    date: date,
-    month: month,
-    year: parseInt(year)
+  }, "Meeting")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
+    style: {
+      width: "100%",
+      height: "10%"
+    }
+  }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(CreateTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(EditTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Meeting, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Week, {
+    date: currentDate,
+    month: currentMonth,
+    year: parseInt(currentYear)
   }));
 }
 
@@ -34843,14 +35013,15 @@ var conn;
 
 function connect(_name) {
   console.log("Connecting");
-  conn = new _webrtc__WEBPACK_IMPORTED_MODULE_9__.default(_name);
+  conn = new _webrtc__WEBPACK_IMPORTED_MODULE_11__.default(_name);
+  /*
   document.getElementById("name").disabled = true;
   document.getElementById("conn").disabled = true;
+  */
 
   conn.onConnect = function () {
     console.log("Connected!"); //logEvent("Connected to Server!");
-
-    document.getElementById("init").style.display = 'none';
+    //document.getElementById("init").style.display = 'none';
   };
 
   conn.onJoinCall = function (data) {
@@ -34944,6 +35115,13 @@ function removeVid(name) {
     document.getElementById("blurOver").style.display = "none";
   }
 }
+
+window.onload = function () {
+  setTimeout(() => {
+    name = Math.random() * 1000;
+    attemptConnection();
+  }, 1000);
+};
 })();
 
 /******/ })()
