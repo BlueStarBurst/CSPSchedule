@@ -25,20 +25,37 @@ import webrtc from "./webrtc";
 // create connection to desired wss 
 var server = new WebSocket("wss://blueserver.us.to:26950/");
 
+var currentDate = new Date();
+currentDate = new Date(2020, 11, 31);
+
 // find current date and time and save them
-let [month, date, year] = new Date().toLocaleDateString("en-US").split("/");
-console.log(date);
-let day = new Date().getDay();
+let [month, date, year] = currentDate.toLocaleDateString("en-US").split("/");
+//console.log(month);
+let day = currentDate.getDay();
+//console.log(day);
+
+
+
 let [hour, minute, second] = new Date().toLocaleTimeString("en-US").split(/:| /);
 hour = new Date().getHours();
 
 // assign days to indexes in an array cuz i don't want to write them 20 times :P
 let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
+var getDaysInMonth = function (month, year) {
+    var dashfkjc = new Date(year, month + 1, 0);
+    //console.log(dashfkjc);
+    //console.log(dashfkjc.getDate);
+    return dashfkjc.getDate();
+};
+
 // height of rows
 let timeHeight = 150;
 
 var loading = false;
+var currentWeek = Math.floor(date / 7);
+var currentYear = year;
+var currentMonth = month;
 
 // when client connect to server
 server.onopen = (e) => {
@@ -46,7 +63,7 @@ server.onopen = (e) => {
     var mess = {
         type: "getWeek",
         month: month,
-        week: Math.floor(date / 7),
+        week: currentWeek,
         date: date,
         year: year
     }
@@ -60,12 +77,20 @@ server.onmessage = (message) => {
 
     // when user recieves an updated week
     if (message.type = "week") {
-        if (message.data) {
-            weeklyMeetings = message.data;
-        } else {
-            weeklyMeetings = [];
+        var update = false;
+        if (!message.year) {
+            return;
         }
-
+        for (var i = 0; i < message.year.length; i++) {
+            console.log(message.year[i] + " " + currentYear + " " + message.month[i] + " " + currentMonth + " " + message.week[i] + " " + currentWeek)
+            if (message.year[i] == currentYear && message.month[i] == currentMonth && message.week[i] == currentWeek) {
+                update = true;
+            }
+        }
+        if (update && message.data) {
+            console.log("asfkj")
+            weeklyMeetings = message.data;
+        }
     }
 }
 
@@ -163,7 +188,7 @@ function CreateTask(props) {
             <div style={style} id="form">
                 <h5>Schedule a meeting!</h5>
                 <br />
-                <Form onSubmit={createServerTask} autocomplete="off">
+                <Form onSubmit={createServerTask} autoComplete="off">
                     <Form.Row>
                         <Form.Group>
                             <Form.Label>Subject</Form.Label>
@@ -269,7 +294,7 @@ function EditTask(props) {
     function removeServerTask(e) {
         document.getElementById("editTask").style.display = "none";
         document.getElementById(selectedMeeting.id + "").className = "removed";
-        console.log(document.getElementById(selectedMeeting.id + "").classList);
+        //console.log(document.getElementById(selectedMeeting.id + "").classList);
         var moveable = {
             type: "removeTask",
             date: selectedMeeting.date,
@@ -291,7 +316,7 @@ function EditTask(props) {
                     <h5>Schedule a meeting!</h5>
                 </div>
                 <br />
-                <Form autocomplete="off">
+                <Form autoComplete="off">
                     <Form.Row>
                         <Form.Group>
                             <Form.Label>Subject</Form.Label>
@@ -403,7 +428,7 @@ function Hour(props) {
     for (var i = 0; i < weeklyMeetings.length; i++) {
         // if the date and time matches, create the Task
         if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2)) {
-            text.push(<Task meeting={weeklyMeetings[i]} />);
+            text.push(<Task meeting={weeklyMeetings[i]} key={weeklyMeetings[i].id} id={weeklyMeetings[i].id} />);
         }
     }
 
@@ -413,9 +438,10 @@ function Hour(props) {
             return;
         }
         if (click <= 100 && !moving) {
+
             document.getElementById("createTask").style.display = "block";
-            console.log(props.realDate);
-            document.getElementById("createDate").value = "2021-03-" + props.realDate;
+            console.log(props.date);
+            document.getElementById("createDate").value = props.year + "-" + ('0' + props.month).slice(-2) + "-" + ('0' + props.date).slice(-2);
             document.getElementById("createTime").value = props.hour + ":00";
         }
     }
@@ -431,7 +457,7 @@ function Hour(props) {
 
 // The header of the table with each days date
 function Header(props) {
-    console.log(props.date)
+    //console.log(props.date)
     return (
         <Table borderless>
             <thead>
@@ -440,7 +466,18 @@ function Header(props) {
                     {Array.from({ length: 7 }).map((_, index) => {
                         var num = props.date - day + index;
                         if (num < 1) {
-                            num = 31 + (props.date - day + index);
+                            if (props.month == 1) {
+                                num = getDaysInMonth(11, props.year - 1) + (props.date - day + index);
+                            } else {
+                                num = getDaysInMonth(props.month - 1, props.year) + (props.date - day + index);
+                            }
+
+                        } else if (num > getDaysInMonth(props.month - 1, props.year)) {
+                            if (props.month == 12) {
+                                num = props.date - day + index - getDaysInMonth(0, props.year + 1);
+                            } else {
+                                num = props.date - day + index - getDaysInMonth(props.month - 1, props.year);
+                            }
                         }
                         return <td key={index} className="header">
                             <h6>{num}</h6> {days[index]}
@@ -479,7 +516,7 @@ function Week(props) {
     return (
         <div className="week" id="week">
             <div className="overlayTop" />
-            <Header date={props.date} />
+            <Header date={props.date} month={props.month} year={props.year} />
             <div className="schedule" onMouseDown={swipe} id="schedule">
                 <div id={"currentTime"} className="currentTime" />
                 <Table bordered hover>
@@ -512,11 +549,36 @@ function Week(props) {
                                 {Array.from({ length: 7 }).map((_, index) => {
                                     // Create each hour!
                                     var num = props.date - day + index;
-                                    console.log(props.date);
+                                    //console.log(num);
+                                    var tempMonth = props.month;
+                                    var tempYear = props.year;
 
-                                    if (num == props.date)
-                                        return <td key={index} className="highlighted"><Hour date={num} hour={time} realDate={props.date} /></td>
-                                    return <td key={index}><Hour date={num} hour={time} realDate={props.date} /></td>
+                                    if (num < 1) {
+                                        if (props.month == 1) {
+                                            num = getDaysInMonth(11, props.year - 1) + (props.date - day + index);
+                                            tempMonth = 12;
+                                            tempYear -= 1;
+                                        } else {
+                                            num = getDaysInMonth(props.month - 1, props.year) + (props.date - day + index);
+                                            tempMonth -= 1;
+                                        }
+
+                                    } else if (num > getDaysInMonth(props.month - 1, props.year)) {
+                                        if (props.month == 12) {
+                                            num = props.date - day + index - getDaysInMonth(0, props.year + 1);
+                                            tempMonth = 1;
+                                            tempYear += 1;
+                                            //console.log(time + " " + tempYear + " " + tempMonth + " " + num);
+                                        } else {
+                                            num = props.date - day + index - getDaysInMonth(props.month - 1, props.year);
+                                            tempMonth += 1;
+                                        }
+                                    }
+
+                                    if (num == date)
+                                        return <td key={index} className="highlighted"><Hour date={num} hour={time} month={tempMonth} year={tempYear} /></td>
+
+                                    return <td key={index}><Hour date={num} hour={time} month={tempMonth} year={tempYear} /></td>
                                 })}
                             </tr>
                         })}
@@ -694,7 +756,7 @@ function Login(props) {
             <InputGroup className="mb-3">
                 <FormControl id="name"
                     placeholder="Username"
-                    autocomplete="off"
+                    autoComplete="off"
                     onChange={(e) => {
                         name = e.target.value;
                     }}
@@ -763,7 +825,7 @@ function UI(props) {
         <EditTask />
         <Meeting />
         <Login />
-        <Week date={date} />
+        <Week date={date} month={month} year={parseInt(year)} />
     </div>)
 }
 

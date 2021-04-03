@@ -79,24 +79,88 @@ const sendToAll = (clients, type, { id, name: userName }) => {
   });
 };
 
+function initSchedule(year, month, week) {
+  if (!schedule[year]) {
+    schedule[year] = {}
+  }
+  if (!schedule[year][month]) {
+    schedule[year][month] = {}
+  }
+  if (!schedule[year][month][week]) {
+    schedule[year][month][week] = {}
+  }
+}
+
+function addToWeeks(year, month, week) {
+  initSchedule(year, month, week);
+  var temparr = Object.values(schedule[year][month][week]);
+
+  if (temparr.length > 0) {
+    return Object.values(schedule[year][month][week]);
+  } else {
+    return [];
+  }
+}
+
 // find specific week meetings in the saved schedule and return it
 function findWeek(year, month, week) {
   var arr = [];
-  if (schedule[year] && schedule[year][month] && schedule[year][month][week]) {
-    arr = Object.values(schedule[year][month][week]);
-  } else {
-    if (!schedule[year]) {
-      schedule[year] = {}
+
+  var currentYears = [];
+  var currentMonths = [];
+  var currentWeeks = [];
+
+  year = parseInt(year);
+  month = parseInt(month);
+  week = parseInt(week);
+
+  if (week == 0) {
+    var lastweek = 0;
+    var tempMonth = month - 1;
+    var tempYear = year;
+
+    if (tempMonth < 1) {
+      tempMonth = 12;
+      tempYear = year - 1;
     }
-    if (!schedule[year][month]) {
-      schedule[year][month] = {}
-    }
-    if (!schedule[year][month][week]) {
-      schedule[year][month][week] = {}
-    }
+
+    initSchedule(tempYear, tempMonth, lastweek);
+    Object.keys(schedule[tempYear][tempMonth]).forEach(element => {
+      if (element > lastweek) {
+        lastweek = element;
+      }
+    });
+    arr = arr.concat(addToWeeks(tempYear, tempMonth, lastweek));
+    currentYears.push(tempYear);
+    currentMonths.push(tempMonth);
+    currentWeeks.push(lastweek);
   }
+  arr = arr.concat(addToWeeks(year, month, week));
+  currentYears.push(year);
+  currentMonths.push(month);
+  currentWeeks.push(week);
+
+  tempMonth = month + 1;
+  tempYear = year;
+
+  if (tempMonth + 1 > 12) {
+    tempYear = year + 1;
+    tempMonth = 1;
+  }
+
+  initSchedule(tempYear, tempMonth, 0);
+  arr = arr.concat(addToWeeks(tempYear, tempMonth, 0));
+  currentYears.push(tempYear);
+  currentMonths.push(tempMonth);
+  currentWeeks.push(0);
+
+  console.log(arr);
+
   var returnMessage = {
     type: "week",
+    year: currentYears,
+    month: currentMonths,
+    week: currentWeeks,
     data: arr
   }
 
@@ -141,6 +205,8 @@ wss.on("connection", ws => {
         var [year, month, week] = data.data.date.split("-");
         week = Math.floor(week / 7);
         month = parseInt(month);
+        year = parseInt(year);
+        initSchedule(year, month, week);
 
         var id = Math.floor(Math.random() * Math.floor(1000));
 

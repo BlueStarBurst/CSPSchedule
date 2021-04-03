@@ -33913,25 +33913,39 @@ __webpack_require__.r(__webpack_exports__);
 
  // create connection to desired wss 
 
-var server = new WebSocket("wss://blueserver.us.to:26950/"); // find current date and time and save them
+var server = new WebSocket("wss://blueserver.us.to:26950/");
+var currentDate = new Date();
+currentDate = new Date(2020, 11, 31); // find current date and time and save them
 
-let [month, date, year] = new Date().toLocaleDateString("en-US").split("/");
-console.log(date);
-let day = new Date().getDay();
+let [month, date, year] = currentDate.toLocaleDateString("en-US").split("/"); //console.log(month);
+
+let day = currentDate.getDay(); //console.log(day);
+
 let [hour, minute, second] = new Date().toLocaleTimeString("en-US").split(/:| /);
 hour = new Date().getHours(); // assign days to indexes in an array cuz i don't want to write them 20 times :P
 
-let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; // height of rows
+let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+
+var getDaysInMonth = function (month, year) {
+  var dashfkjc = new Date(year, month + 1, 0); //console.log(dashfkjc);
+  //console.log(dashfkjc.getDate);
+
+  return dashfkjc.getDate();
+}; // height of rows
+
 
 let timeHeight = 150;
-var loading = false; // when client connect to server
+var loading = false;
+var currentWeek = Math.floor(date / 7);
+var currentYear = year;
+var currentMonth = month; // when client connect to server
 
 server.onopen = e => {
   // get current schedule on server
   var mess = {
     type: "getWeek",
     month: month,
-    week: Math.floor(date / 7),
+    week: currentWeek,
     date: date,
     year: year
   };
@@ -33944,10 +33958,23 @@ server.onmessage = message => {
   console.log(message); // when user recieves an updated week
 
   if (message.type = "week") {
-    if (message.data) {
+    var update = false;
+
+    if (!message.year) {
+      return;
+    }
+
+    for (var i = 0; i < message.year.length; i++) {
+      console.log(message.year[i] + " " + currentYear + " " + message.month[i] + " " + currentMonth + " " + message.week[i] + " " + currentWeek);
+
+      if (message.year[i] == currentYear && message.month[i] == currentMonth && message.week[i] == currentWeek) {
+        update = true;
+      }
+    }
+
+    if (update && message.data) {
+      console.log("asfkj");
       weeklyMeetings = message.data;
-    } else {
-      weeklyMeetings = [];
     }
   }
 }; // Storage for tutorials 
@@ -34040,7 +34067,7 @@ function CreateTask(props) {
     id: "form"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default, {
     onSubmit: createServerTask,
-    autocomplete: "off"
+    autoComplete: "off"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "text",
     id: "createSubject",
@@ -34146,8 +34173,8 @@ function EditTask(props) {
 
   function removeServerTask(e) {
     document.getElementById("editTask").style.display = "none";
-    document.getElementById(selectedMeeting.id + "").className = "removed";
-    console.log(document.getElementById(selectedMeeting.id + "").classList);
+    document.getElementById(selectedMeeting.id + "").className = "removed"; //console.log(document.getElementById(selectedMeeting.id + "").classList);
+
     var moveable = {
       type: "removeTask",
       date: selectedMeeting.date,
@@ -34175,7 +34202,7 @@ function EditTask(props) {
       margin: "auto"
     }
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("h5", null, "Schedule a meeting!")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default, {
-    autocomplete: "off"
+    autoComplete: "off"
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Row, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Group, null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Label, null, "Subject"), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Form__WEBPACK_IMPORTED_MODULE_10__.default.Control, {
     type: "text",
     id: "editSubject",
@@ -34295,7 +34322,9 @@ function Hour(props) {
     // if the date and time matches, create the Task
     if (props.date == parseInt(weeklyMeetings[i].date.split("-")[2]) && props.hour == weeklyMeetings[i].time.substr(0, 2)) {
       text.push( /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Task, {
-        meeting: weeklyMeetings[i]
+        meeting: weeklyMeetings[i],
+        key: weeklyMeetings[i].id,
+        id: weeklyMeetings[i].id
       }));
     }
   } // when an hour is clicked, show the createTask element
@@ -34308,8 +34337,8 @@ function Hour(props) {
 
     if (click <= 100 && !moving) {
       document.getElementById("createTask").style.display = "block";
-      console.log(props.realDate);
-      document.getElementById("createDate").value = "2021-03-" + props.realDate;
+      console.log(props.date);
+      document.getElementById("createDate").value = props.year + "-" + ('0' + props.month).slice(-2) + "-" + ('0' + props.date).slice(-2);
       document.getElementById("createTime").value = props.hour + ":00";
     }
   } // another return JSX
@@ -34326,7 +34355,7 @@ function Hour(props) {
 
 
 function Header(props) {
-  console.log(props.date);
+  //console.log(props.date)
   return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_Table__WEBPACK_IMPORTED_MODULE_12__.default, {
     borderless: true
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("thead", null, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", {
@@ -34339,7 +34368,17 @@ function Header(props) {
     var num = props.date - day + index;
 
     if (num < 1) {
-      num = 31 + (props.date - day + index);
+      if (props.month == 1) {
+        num = getDaysInMonth(11, props.year - 1) + (props.date - day + index);
+      } else {
+        num = getDaysInMonth(props.month - 1, props.year) + (props.date - day + index);
+      }
+    } else if (num > getDaysInMonth(props.month - 1, props.year)) {
+      if (props.month == 12) {
+        num = props.date - day + index - getDaysInMonth(0, props.year + 1);
+      } else {
+        num = props.date - day + index - getDaysInMonth(props.month - 1, props.year);
+      }
     }
 
     return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
@@ -34376,7 +34415,9 @@ function Week(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "overlayTop"
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Header, {
-    date: props.date
+    date: props.date,
+    month: props.month,
+    year: props.year
   }), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", {
     className: "schedule",
     onMouseDown: swipe,
@@ -34422,22 +34463,47 @@ function Week(props) {
       length: 7
     }).map((_, index) => {
       // Create each hour!
-      var num = props.date - day + index;
-      console.log(props.date);
-      if (num == props.date) return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
+      var num = props.date - day + index; //console.log(num);
+
+      var tempMonth = props.month;
+      var tempYear = props.year;
+
+      if (num < 1) {
+        if (props.month == 1) {
+          num = getDaysInMonth(11, props.year - 1) + (props.date - day + index);
+          tempMonth = 12;
+          tempYear -= 1;
+        } else {
+          num = getDaysInMonth(props.month - 1, props.year) + (props.date - day + index);
+          tempMonth -= 1;
+        }
+      } else if (num > getDaysInMonth(props.month - 1, props.year)) {
+        if (props.month == 12) {
+          num = props.date - day + index - getDaysInMonth(0, props.year + 1);
+          tempMonth = 1;
+          tempYear += 1; //console.log(time + " " + tempYear + " " + tempMonth + " " + num);
+        } else {
+          num = props.date - day + index - getDaysInMonth(props.month - 1, props.year);
+          tempMonth += 1;
+        }
+      }
+
+      if (num == date) return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
         key: index,
         className: "highlighted"
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Hour, {
         date: num,
         hour: time,
-        realDate: props.date
+        month: tempMonth,
+        year: tempYear
       }));
       return /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", {
         key: index
       }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Hour, {
         date: num,
         hour: time,
-        realDate: props.date
+        month: tempMonth,
+        year: tempYear
       }));
     }));
   })))));
@@ -34618,7 +34684,7 @@ function Login(props) {
   }, /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(react_bootstrap_FormControl__WEBPACK_IMPORTED_MODULE_14__.default, {
     id: "name",
     placeholder: "Username",
-    autocomplete: "off",
+    autoComplete: "off",
     onChange: e => {
       name = e.target.value;
     },
@@ -34686,7 +34752,9 @@ function UI(props) {
     id: "meettitle",
     className: "title"
   }, "Meeting")), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(CreateTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(EditTask, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Meeting, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Login, null), /*#__PURE__*/react__WEBPACK_IMPORTED_MODULE_0__.createElement(Week, {
-    date: date
+    date: date,
+    month: month,
+    year: parseInt(year)
   }));
 }
 
@@ -34842,7 +34910,7 @@ function createVid(name, data) {
     }
   }
 
-  if (alreadyExists) {
+  if (!alreadyExists) {
     var container = document.createElement('div');
     container.id = name;
     container.className = "videoBox";
