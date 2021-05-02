@@ -1,5 +1,7 @@
 export default class webrtc {
 
+    //Structure and WebRTC Candidate code based on: https://blog.logrocket.com/get-a-basic-chat-application-working-with-webrtc/
+
     constructor(_name) {
 
         // using googles stun server cuz they didn't say no

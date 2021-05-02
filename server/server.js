@@ -183,6 +183,7 @@ function findWeek(year, month, week) {
   saveSchedule();
 }
 
+// Structure and WebRTC Candidate code based on: https://blog.logrocket.com/get-a-basic-chat-application-working-with-webrtc/
 // when the websocket server recieves a connection
 wss.on("connection", ws => {
 

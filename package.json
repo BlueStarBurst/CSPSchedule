@@ -29,14 +29,11 @@
     "ws": "^7.4.2"
   },
   "dependencies": {
-    "@react-three/drei": "^3.3.0",
     "bootstrap": "^4.5.3",
     "browser-window": "^0.4.0",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.3",
     "react-dom": "^17.0.1",
-    "react-three-fiber": "^5.3.11",
-    "remote": "^0.2.6",
-    "three": "^0.125.2"
+    "remote": "^0.2.6"
   }
 }

@@ -73,25 +73,29 @@ server.onopen = (e) => {
     server.send(JSON.stringify(mess));
 }
 
-// when client recieves message from server
+function needsUpdate(message) {
+    if (!message.year) {
+        return;
+    }
+    for (var i = 0; i < message.year.length; i++) {
+        console.log(message.year[i] + " " + currentYear + " " + message.month[i] + " " + currentMonth + " " + message.week[i] + " " + currentWeek)
+        if (message.year[i] == currentYear && message.month[i] == currentMonth && message.week[i] == currentWeek) {
+            return true;
+        }
+    }
+    return false;
+}
+
+// when client receives message from server
 server.onmessage = (message) => {
     message = JSON.parse(message.data);
     console.log(message)
 
-    // when user recieves an updated week
+    // when user receives an updated week
     if (message.type = "week") {
-        var update = false;
-        if (!message.year) {
-            return;
-        }
-        for (var i = 0; i < message.year.length; i++) {
-            console.log(message.year[i] + " " + currentYear + " " + message.month[i] + " " + currentMonth + " " + message.week[i] + " " + currentWeek)
-            if (message.year[i] == currentYear && message.month[i] == currentMonth && message.week[i] == currentWeek) {
-                update = true;
-            }
-        }
+        var update = needsUpdate(message);
+        
         if (update && message.data) {
-            console.log("asfkj")
             weeklyMeetings = message.data;
         }
     }

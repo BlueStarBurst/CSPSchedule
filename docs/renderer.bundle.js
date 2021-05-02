@@ -72,6 +72,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (/* binding */ webrtc)
 /* harmony export */ });
 class webrtc {
+  //Structure and WebRTC Candidate code based on: https://blog.logrocket.com/get-a-basic-chat-application-working-with-webrtc/
   constructor(_name) {
     // using googles stun server cuz they didn't say no
     this.STUN = {
@@ -33985,30 +33986,33 @@ server.onopen = e => {
     year: year
   };
   server.send(JSON.stringify(mess));
-}; // when client recieves message from server
+};
+
+function needsUpdate(message) {
+  if (!message.year) {
+    return;
+  }
+
+  for (var i = 0; i < message.year.length; i++) {
+    console.log(message.year[i] + " " + currentYear + " " + message.month[i] + " " + currentMonth + " " + message.week[i] + " " + currentWeek);
+
+    if (message.year[i] == currentYear && message.month[i] == currentMonth && message.week[i] == currentWeek) {
+      return true;
+    }
+  }
+
+  return false;
+} // when client receives message from server
 
 
 server.onmessage = message => {
   message = JSON.parse(message.data);
-  console.log(message); // when user recieves an updated week
+  console.log(message); // when user receives an updated week
 
   if (message.type = "week") {
-    var update = false;
-
-    if (!message.year) {
-      return;
-    }
-
-    for (var i = 0; i < message.year.length; i++) {
-      console.log(message.year[i] + " " + currentYear + " " + message.month[i] + " " + currentMonth + " " + message.week[i] + " " + currentWeek);
-
-      if (message.year[i] == currentYear && message.month[i] == currentMonth && message.week[i] == currentWeek) {
-        update = true;
-      }
-    }
+    var update = needsUpdate(message);
 
     if (update && message.data) {
-      console.log("asfkj");
       weeklyMeetings = message.data;
     }
   }
